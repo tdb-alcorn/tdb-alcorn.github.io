@@ -4,15 +4,9 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
+<!-- ![Me]({{ "/img/small-wreck-tom.jpg" | absolute_url }} =250x) -->
+<img src="/assets/img/small-wreck-tom.jpg" alt="Me" style="width: 250px;" />
 
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
-
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
-
-
-[jekyll-organization]: https://github.com/jekyll
+I am a software person and I like to make things that surprise me.
+I know stuff about math, coding and motorcycles.
+I am usually physically embodied in San Francisco.
