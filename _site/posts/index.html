@@ -11,7 +11,10 @@
 
   <link rel="stylesheet" href="/assets/main.css">
   <link rel="canonical" href="http://localhost:4000/posts/">
-  <link rel="alternate" type="application/rss+xml" title="Tom Alcorn" href="/feed.xml">
+  <link rel="alternate" type="application/rss+xml" title="Tom Alcorn&#39;s Blog" href="/feed.xml">
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono:400|Rubik:400,900" rel="stylesheet">
 
   <!-- <link rel="stylesheet" href="https://unpkg.com/tachyons@4.9.0/css/tachyons.min.css"/> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
@@ -22,12 +25,29 @@
 
   <body>
 
-    <header class="site-header" role="banner">
+    <!-- <div class="hero" style="background-image: url(/assets/img/small-wreck-tom.jpg)"> -->
+    
+      <div class="hero" style="background-image: url(/assets/img/wave-whale.jpg)">
+        <header class="site-header" role="banner">
 
   <div class="wrapper">
     
     
-    <a class="site-title" href="/">Tom Alcorn</a>
+    <div class="header-wrapper">
+      <div class="site-title-wrapper">
+        <a class="site-title" href="/">Tom Alcorn&#39;s Blog</a>
+      </div>
+
+      
+        <div class='title-wrapper'>
+          <header class="post-header title-pop">
+            <h1 class="post-title" itemprop="name headline">Posts</h1>
+            
+          </header>
+        </div>
+      
+
+    </div>
   
     
       <nav class="site-nav">
@@ -65,6 +85,11 @@
           
             
             
+            <a class="page-link" href="/papers/">Papers</a>
+            
+          
+            
+            
           
         </div>
       </nav>
@@ -72,6 +97,8 @@
   </div>
 </header>
 
+      </div>
+    
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
@@ -79,16 +106,23 @@
           <div class="with-sidebar-content">
             <article class="post">
 
-  <header class="post-header">
-    <h1 class="post-title">Posts</h1>
-  </header>
-
   <div class="post-content">
     <div class="home">
 
-  <h1 class="page-heading">Posts</h1>
-
   <ul class="post-list">
+    
+      <li>
+        
+        <span class="post-meta">Dec 17, 2017</span>
+
+        <h2>
+          <a class="post-link" href="/2017/12/17/seeing-like-a-perceptron.html">Seeing Like A Perceptron</a>
+        </h2>
+        <p>Perceptrons were one of the earliest supervised learning models, and though they went unloved for about 50 years, they’ve recently experienced a huge comeback as “multi-layer perceptrons” a.k.a. neural networks. In this post I want to explore how some visualisations of what a perceptron “sees”, which will help us understand why chaining together multiple layers of perceptrons is such an effective trick.</p>
+
+
+        ...
+      </li>
     
       <li>
         
@@ -97,6 +131,8 @@
         <h2>
           <a class="post-link" href="/2017/12/16/keyboard-shortcuts.html">Some funky keyboard shortcuts</a>
         </h2>
+        In which your correspondent finds true love
+        ...
       </li>
     
       <li>
@@ -106,6 +142,10 @@
         <h2>
           <a class="post-link" href="/jekyll/update/2017/12/16/welcome-to-jekyll.html">Welcome to Jekyll!</a>
         </h2>
+        <p>You’ll find this post in your <code class="highlighter-rouge">_posts</code> directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run <code class="highlighter-rouge">jekyll serve</code>, which launches a web server and auto-regenerates your site when a file is updated.</p>
+
+
+        ...
       </li>
     
       <li>
@@ -115,6 +155,9 @@
         <h2>
           <a class="post-link" href="/2017/12/16/a-new-post.html">A New Post</a>
         </h2>
+        
+
+        ...
       </li>
     
   </ul>
@@ -128,8 +171,7 @@
 </article>
 
           </div>
-          
-<div class="sidebar">
+          <div class="sidebar">
     
     
         <p>Math, machine learning, and generative art.</p>
@@ -170,6 +212,11 @@
           
             
             
+            <a class="page-link" href="/papers/">Papers</a>
+            
+          
+            
+            
           
         </div>
       </nav>
@@ -183,7 +230,7 @@
 
   <div class="wrapper">
 
-    <!-- <h2 class="footer-heading">Tom Alcorn</h2> -->
+    <!-- <h2 class="footer-heading">Tom Alcorn&#39;s Blog</h2> -->
 
     <div class="footer-col-wrapper">
       <div class="footer-col footer-col-1">
@@ -199,20 +246,17 @@
 
           </li>
           
-
-          <!--  -->
         </ul>
       </div>
 
       <div class="footer-col footer-col-3">
         <ul class="contact-list">
-          <!-- <li>
             
-              Tom Alcorn
-            
-            </li> -->
-            
-            <li><a href="mailto:tdb.alcorn@gmail.com">tdb.alcorn@gmail.com</a></li>
+            <li>
+              <!-- <a href="mailto:tdbalcorn@gmail.com"> -->
+                tdbalcorn at gmail.com
+              <!-- </a> -->
+            </li>
             
         </ul>
       </div>

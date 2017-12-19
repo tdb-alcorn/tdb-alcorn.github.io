@@ -3,7 +3,30 @@
   <div class="wrapper">
     {% assign default_paths = site.pages | map: "path" %}
     {% assign page_paths = site.header_pages | default: default_paths %}
-    <a class="site-title" href="{{ "/" | relative_url }}">{{ site.title | escape }}</a>
+    <div class="header-wrapper">
+      <div class="site-title-wrapper">
+        <a class="site-title" href="{{ "/" | relative_url }}">{{ site.title | escape }}</a>
+      </div>
+
+      {% if page.title %}
+        <div class='title-wrapper'>
+          <header class="post-header title-pop">
+            <h1 class="post-title" itemprop="name headline">{{ page.title | escape }}</h1>
+            {% if page.date %}
+              <p class="post-meta">
+                <time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">
+                  {% assign date_format = site.minima.date_format | default: "%b %-d, %Y" %}
+                  {{ page.date | date: date_format }}
+                </time>
+                {% if page.author %}
+                  • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{ page.author }}</span></span>
+                {% endif %}</p>
+            {% endif %}
+          </header>
+        </div>
+      {% endif %}
+
+    </div>
   
     {% if page_paths %}
       <nav class="site-nav">

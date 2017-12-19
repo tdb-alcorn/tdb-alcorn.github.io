@@ -1,7 +1,7 @@
 ---
 layout: page
-title: About
-permalink: /about/
+title: Papers
+permalink: /papers/
 ---
 
 <!-- ![Me]({{ "/img/small-wreck-tom.jpg" | absolute_url }} =250x) -->

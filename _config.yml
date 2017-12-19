@@ -13,15 +13,17 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Tom Alcorn
+title: Tom Alcorn's Blog
 author: Tom Alcorn
-email: tdb.alcorn@gmail.com
+email: tdbalcorn@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Math, machine learning, and generative art.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
 github_username:  tdb-alcorn
+header:
+  default_image: /assets/img/wave-whale.jpg
 
 # Build settings
 markdown: kramdown

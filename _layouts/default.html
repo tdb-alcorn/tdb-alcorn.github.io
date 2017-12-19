@@ -5,7 +5,16 @@
 
   <body>
 
-    {% include header.html %}
+    <!-- <div class="hero" style="background-image: url({{ '/assets/img/small-wreck-tom.jpg' | relative_url }})"> -->
+    {% if page.header.image %}
+      <div class="hero" style="background-image: url({{ page.header.image | relative_url }})">
+        {% include header.html %}
+      </div>
+    {% else %}
+      <div class="hero" style="background-image: url({{ site.header.default_image | relative_url }})">
+        {% include header.html %}
+      </div>
+    {% endif %}
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">

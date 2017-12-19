@@ -2,6 +2,8 @@
 layout: post
 title:  "Some funky keyboard shortcuts"
 date:   2017-12-16 15:59:53 -0800
+header:
+    image: /assets/img/small-wreck-tom.jpg
 excerpt: In which your correspondent finds true love
 ---
 In this notebook, you'll get some practice using keyboard shortcuts. These are key to becoming proficient at using notebooks and will greatly increase your work speed.
