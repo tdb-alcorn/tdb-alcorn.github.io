@@ -4,8 +4,10 @@
     {% assign default_paths = site.pages | map: "path" %}
     {% assign page_paths = site.header_pages | default: default_paths %}
     <div class="header-wrapper">
-      <div class="site-title-wrapper">
-        <a class="site-title" href="{{ "/" | relative_url }}">{{ site.title | escape }}</a>
+      <div class="site-title-box">
+        <div class="site-title-wrapper">
+          <a class="site-title" href="{{ "/" | relative_url }}">{{ site.title | escape }}</a>
+        </div>
       </div>
 
       {% if page.title %}

@@ -6,11 +6,11 @@ permalink: /about/
 
 <!-- ![Me]({{ "/img/small-wreck-tom.jpg" | absolute_url }} =250x) -->
 
-I am a software person and I like to make things that surprise me.
-I know stuff about math, coding and motorcycles.
-I am usually physically embodied in San Francisco.
+I'm Tom.
 
-You can get my resumé [here]({{ "/assets/doc/alcorn-resume.pdf" | relative_url }}).
+I like to make things that surprise me. I can tell you about math, coding and motorcycles. I am usually in San Francisco. You can get my resumé [here]({{ "/assets/doc/alcorn-resume.pdf" | relative_url }}).
+
+Reach out to me by email (_tdbalcorn at gmail.com_) if you want to talk.
 
 <br>
 

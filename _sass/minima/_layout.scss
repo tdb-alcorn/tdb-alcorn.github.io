@@ -27,6 +27,10 @@
   flex-direction: column;
 }
 
+.site-title-box {
+  display: inline-block;
+}
+
 .site-title-wrapper {
   color: white;
   background: black;
@@ -35,6 +39,7 @@
 
 .title-wrapper {
   display: inline-block;
+  margin-top: 100px;
 }
 
 .hero {
@@ -48,7 +53,6 @@
   margin: 50px 0px;
   padding: 5px;
   display: inline-block;
-  float: left;
 }
 
 .site-title {
@@ -60,7 +64,7 @@
   margin-left: 5px;
   margin-right: 5px;
   margin-bottom: 0;
-  float: left;
+  // float: left;
   display: inline-block;
 
   &,
@@ -269,6 +273,18 @@
  */
 .page-content {
   padding: $spacing-unit 0;
+
+  h2, h3 {
+    a {
+      color: #000000;
+    }
+  }
+
+  .subtitle {
+    font-family: 'Roboto Mono', monospace;
+    color: $grey-color;
+    font-size: 14px;
+  }
 }
 
 .page-heading {
