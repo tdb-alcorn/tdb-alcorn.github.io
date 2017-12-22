@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Seeing Like A Perceptron</title>
-  <meta name="description" content="Perceptrons were one of the earliest supervised learning models, and though they went unloved for about 50 years, they’ve recently experienced a huge comebac...">
+  <meta name="description" content="It&#39;s maths, not magic">
 
   <link rel="stylesheet" href="/assets/main.css">
   <link rel="canonical" href="http://localhost:4000/2017/12/17/seeing-like-a-perceptron.html">
@@ -46,7 +46,7 @@
             <h1 class="post-title" itemprop="name headline">Seeing Like A Perceptron</h1>
             
               <p class="post-meta">
-                <time datetime="2017-12-17T15:59:53-08:00" itemprop="datePublished">
+                <time datetime="2017-12-18T10:59:53+11:00" itemprop="datePublished">
                   
                   Dec 17, 2017
                 </time>
@@ -116,31 +116,49 @@
             <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <div class="post-content" itemprop="articleBody">
-    <p>Perceptrons were one of the earliest supervised learning models, and though they went unloved for about 50 years, they’ve recently experienced a huge comeback as “multi-layer perceptrons” a.k.a. neural networks. In this post I want to explore how some visualisations of what a perceptron “sees”, which will help us understand why chaining together multiple layers of perceptrons is such an effective trick.</p>
+    <p>Perceptrons were one of the earliest supervised learning models, and though they went out of fashion for about 50 years, they’ve more recently experienced a huge comeback in the form of multi-layer perceptrons, also known as neural networks. You may have heard about how neural networks can now perform all kinds of marvelous and perhaps unsettling feats, such as <a href="https://research.googleblog.com/2015/08/the-neural-networks-behind-google-voice.html">recognising speech</a>, <a href="https://cs.stanford.edu/people/karpathy/deepimagesent/">captioning images</a> and <a href="http://googleresearch.blogspot.com/2016/01/alphago-mastering-ancient-game-of-go.html">beating humans at games</a>. But they are surrounded by an unfortunate aura of mystery and magic, and I sometimes hear people complain that the study of neural networks lacks sound theoretical foundations. To debunk this idea, I’ll explore some visualisations of what a perceptron “sees” when it makes a decision, which will help us understand why chaining together multiple layers of perceptrons is such an effective technique.</p>
 
-<p>Briefly, a perceptron is a type of linear model that learns a decision boundary by averaging together data points until it reaches a stable solution. For the purposes of visualisation I’ll only be considering perceptrons with 2 inputs, but the intuition we’ll develop applies equally well to higher dimensional data (although it is substantially trickier to visualise). So, for our purposes, a perceptron is a function of an input vector that produces a prediction (also called an activation). You will usually see this function written as</p>
+<p>First, some background: a perceptron is a type of linear model that learns a decision boundary by averaging together data points until it reaches a stable solution. I’ll only be considering perceptrons with two input nodes, but the intuition we’ll develop applies equally well to higher dimensional data, although it becomes substantially trickier to visualise. For our purposes, a trained perceptron is a function of an input vector <script type="math/tex">x</script> that produces a prediction <script type="math/tex">\hat{y}</script>, between 0 and 1. You will usually see this function written as
+<script type="math/tex">\hat{y} = \sigma(Wx + b)</script>
+where <script type="math/tex">\sigma</script> is the <a href="https://en.wikipedia.org/wiki/Sigmoid_function">sigmoid activation function</a>, <script type="math/tex">W</script> is a vector of weights connecting units in the network, <script type="math/tex">x</script> is the input vector (the data) and <script type="math/tex">b</script> is a bias term. However, the bias won’t qualitatively change the following visualisations so I am going to set all biases to 0 to keep things simple. So, in the 2 input case this breaks down as
+<script type="math/tex">\hat{y} = \sigma(w_0 x_0 + w_1 x_1)</script>
+Essentially, a perceptron takes a weighted average of its input nodes and then computes the sigmoid of the result, yielding a result between 0 and 1. Why the sigmoid? This may seem myterious and arbitrary to you right now, but we are going to pry open the black box to see why the sigmoid works as an activation function.</p>
 
-<script type="math/tex; mode=display">\hat{y} = \sigma(Wx + b)</script>
+<p>We’ll be thinking about the perceptron as a classifer, which means that we use the output of the perceptron to partition the input space into two classes, <strong>class #0</strong> and <strong>class #1</strong>. The line between the classes is the decision boundary, and it corresponds to a contour (line of constant value) of the perceptron function, typically something like <script type="math/tex">\hat{y}</script> = 0.5.</p>
 
-<p>where <script type="math/tex">\hat{y}</script> is the predicted value, <script type="math/tex">\sigma</script> is the <a href="https://en.wikipedia.org/wiki/Sigmoid_function">sigmoid function</a>, <script type="math/tex">W</script> is a vector of weights, <script type="math/tex">x</script> is the input vector and <script type="math/tex">b</script> is a bias term. In the 2 input case this breaks down as</p>
-
-<script type="math/tex; mode=display">\hat{y} = \sigma(w_0 x_0 + w_1 x_1 + b)</script>
-
-<p>Essentially, a perceptron takes a weighted average of its inputs and then computes the sigmoid of the result, yielding a result between 0 and 1. The weighted average part seems reasonable enough, but why compute a sigmoid? This may seem myterious and arbitrary to you right now, but we are going pry open the black box to see why the sigmoid activation function works very well.</p>
-
-<p>For a two input perceptron, the decision boundary is a contour (line of constant value) of a function of the two inputs.</p>
+<p>Ok, enough with the small talk, let’s start visualising stuff! This is our data, the ground truth that our model will try to learn:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">matplotlib</span>
 <span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
-<span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s">'figure.dpi'</span><span class="p">]</span><span class="o">=</span> <span class="mi">300</span>
+<span class="o">%</span><span class="n">config</span> <span class="n">InlineBackend</span><span class="o">.</span><span class="n">figure_format</span> <span class="o">=</span> <span class="s">'retina'</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
-</code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 
-<span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="n">label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+<span class="n">data_0</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">label</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">data_1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">label</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_0</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #0'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #1'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">"$x_0$"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">"$x_1$"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_2_1.png" alt="png" /></p>
+
+<p>And here is our neural network:</p>
+
+<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/network-diagram.svg" alt="network-diagram.svg" /></p>
+
+<p>It has 2 inputs, 1 output, and a hidden layer with 2 perceptron units in the middle. And here are the two decision boundaries that the hidden layer perceptrons have found:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">x</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">perceptron</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
@@ -148,29 +166,16 @@
 
 <span class="k">def</span> <span class="nf">decision_boundary</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
     <span class="k">return</span> <span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x0</span>
-</code></pre></div></div>
 
-<p>I define two perceptrons that divide the data in two different ways. We will see how they combine to transform the data into a new space in which they can be linearly separated. The bias won’t qualitatively change the following visualisations so I am going to set it to 0 to keep things simple.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 <span class="n">w0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 <span class="n">w1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">])</span>
 
-<span class="n">data_0</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">label</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
-<span class="n">data_1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">label</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
 <span class="n">t0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">t1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
 
-<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_0</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #0'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #1'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">"$x_0$"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">"$x_1$"</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-
-<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_0</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #0'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #1'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span> <span class="n">decision_boundary</span><span class="p">(</span><span class="n">w0</span><span class="p">,</span> <span class="n">t0</span><span class="p">),</span> <span class="s">'m'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Perceptron #0 decision boundary'</span><span class="p">)</span>
@@ -180,13 +185,50 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_4_1.png" alt="png" /></p>
+<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_6_1.png" alt="png" /></p>
 
-<p>Perceptron #0 classifies everything above the line as 1 and everything below the line as 0, and perceptron #1 classifies everything to the right as 1 and everything to the left as 0. You can see that on their own, neither perceptron does a very good job of classifying the data, but there is a region, the upper right, in which they both get most of their predictions correct. If we could somehow combine these decision boundaries we might have a reasonably good classifier…</p>
+<p>Perceptron #0 classifies everything to the right of the line as 1 and everything to the left as 0, and perceptron #1 classifies everything above the line as 1 and everything below as 0. You can see that on their own, neither perceptron does a very good job of classifying the data, but there is a region, the upper right quadrant, in which they both get most of their predictions correct. If we could somehow combine these decision boundaries we might have a reasonably good classifier…</p>
 
-<p>And this is precisely what a multi-layer perceptron does! We’ll make a second layer that combines the outputs of the first layer (the outputs of perceptrons #0 and #1) to make a better prediction than either classifier in the first layer could have independently come up with.</p>
+<p>And this is precisely what a multi-layer perceptron does! We’ve made a second layer that combines the outputs of the first layer (the outputs of perceptrons #0 and #1) to make a better prediction than either classifier in the first layer could have independently come up with.</p>
 
 <p>But as we know, a perceptron is a linear model: the only thing it can do is draw a line through the input space that hopefully separates the data into two classes. This means that if our second layer makes good predictions, the inputs that it received must have been linearly separable (or nearly so). Therefore, we can deduce that the first layer must have performed some kind of transformation on the original data that yielded a new set of data that was linearly separable! A natural question, then, is what exactly do the inputs to the second layer look like? Or, to put it more precisely, what does our input space look like after the first layer has applied its transformation?</p>
+
+<p>To get an idea of what happens, let’s look at what happens to the gridlines in the input space once they’ve been transformed by the hidden layer:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nl_transform</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="n">perceptron</span><span class="p">(</span><span class="n">w0</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">perceptron</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">x</span><span class="p">)],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+<span class="n">n_gridlines</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">gridline_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n_gridlines</span><span class="p">)</span>
+<span class="n">gridline_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n_gridlines</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">glx</span> <span class="ow">in</span> <span class="n">gridline_x</span><span class="p">:</span>
+    <span class="n">g_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_gridlines</span><span class="p">)</span> <span class="o">+</span> <span class="n">glx</span><span class="p">,</span> <span class="n">gridline_y</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">g_t</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">g_t</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'xkcd:rust'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">gly</span> <span class="ow">in</span> <span class="n">gridline_y</span><span class="p">:</span>
+    <span class="n">g_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">gridline_x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_gridlines</span><span class="p">)</span> <span class="o">+</span> <span class="n">gly</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">g_t</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">g_t</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'xkcd:deep blue'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">"$x_0$"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">"$x_1$"</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">glx</span> <span class="ow">in</span> <span class="n">gridline_x</span><span class="p">:</span>
+    <span class="n">g_t</span> <span class="o">=</span> <span class="n">nl_transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_gridlines</span><span class="p">)</span> <span class="o">+</span> <span class="n">glx</span><span class="p">,</span> <span class="n">gridline_y</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">g_t</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">g_t</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'xkcd:rust'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">gly</span> <span class="ow">in</span> <span class="n">gridline_y</span><span class="p">:</span>
+    <span class="n">g_t</span> <span class="o">=</span> <span class="n">nl_transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">gridline_x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_gridlines</span><span class="p">)</span> <span class="o">+</span> <span class="n">gly</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">g_t</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">g_t</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'xkcd:deep blue'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'Perceptron #0 output'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'Perceptron #1 output'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_9_1.png" alt="png" /></p>
+
+<p>Woah! Here the <script type="math/tex">y</script> (vertical) gridlines from the input space are plotted in red and the <script type="math/tex">x</script> (horizontal) gridlines are plotted in blue. So what does this tell us? First, notice that the entirety of our two-dimensional space (all of <script type="math/tex">\mathbb{R}^2</script>) has been mapped into a 1x1 square centred on the point (0.5,0.5). This is a consequence of the sigmoid function, which only outputs values between 0 and 1. Most of the new space is filled up with gridlines that were close to the decision boundaries in the input space. All the other gridlines (extending off to <script type="math/tex">\pm \infty</script> in both directions) have been squished up against the sides of the 1x1 square.</p>
+
+<p>So what happened to our data?</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nl_transform</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="n">perceptron</span><span class="p">(</span><span class="n">w0</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">perceptron</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">x</span><span class="p">)],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
 
@@ -197,7 +239,7 @@
 <span class="n">db0</span> <span class="o">=</span> <span class="n">nl_transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t0</span><span class="p">,</span> <span class="n">decision_boundary</span><span class="p">(</span><span class="n">w0</span><span class="p">,</span> <span class="n">t0</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 <span class="n">db1</span> <span class="o">=</span> <span class="n">nl_transform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t1</span><span class="p">,</span> <span class="n">decision_boundary</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">t1</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_t_0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_t_0</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #0'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_t_1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_t_1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #1'</span><span class="p">)</span>
@@ -208,17 +250,17 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_7_1.png" alt="png" /></p>
+<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_11_1.png" alt="png" /></p>
 
-<p>Holy smokes! This looks promising, because we can immediately see that the data has been squished out to the sides of the plot and is now linearly separable. Additionally, something interesting has happened to the decision boundaries: they have become like a set of axes (an orthogonal basis for the space). Could we have guessed that this would happen? It turns out we could have: remember that a decision boundary is just a line along which the perceptron predicts a constant value, called the threshold. For example, if our decision threshold is 0.5 then the decision boundary is the set of points along which the perceptron outputs <script type="math/tex">\hat{y}</script> = 0.5. Now, since the predictions of each perceptron make up the coordinates of our new space, we see the decision boundaries as lines of constant value in each coordinate positioned at the decision threshold.</p>
+<p>Holy smokes! We can immediately see that the data has been squished out to the sides of the plot and is now linearly separable, meaning that a perceptron that used this space as input would be able to draw a linear decision boundary that correctly classifies all the data. Additionally, something interesting has happened to the old decision boundaries: they have become like a set of axes (an orthogonal basis for the space). Could we have guessed that this would happen? It turns out we could have: remember that a decision boundary is just a line along which the perceptron predicts a constant value, called the threshold. For example, if our decision threshold is 0.5 then the decision boundary is the set of points along which the perceptron outputs <script type="math/tex">\hat{y}</script> = 0.5. Now, since the predictions of each perceptron make up the coordinates of our new space, we see the decision boundaries as lines of constant value in each coordinate positioned at the decision threshold.</p>
 
-<p>To get some more intuition for what this transformation has actually done, it would be nice to see where the gridlines from the original input space ended up in this new space. That is to say, what happened to our original axes?</p>
+<p>Let’s see the data and the gridlines together:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">n_gridlines</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">gridline_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n_gridlines</span><span class="p">)</span>
 <span class="n">gridline_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n_gridlines</span><span class="p">)</span>
 
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">glx</span> <span class="ow">in</span> <span class="n">gridline_x</span><span class="p">:</span>
@@ -245,21 +287,305 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'Perceptron #1 output'</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_9_1.png" alt="png" /></p>
+<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_13_1.png" alt="png" /></p>
 
-<p>Woah! Here the <script type="math/tex">y</script> (vertical) gridlines from the input space are plotted in red and the <script type="math/tex">x</script> (horizontal) gridlines are plotted in blue. So what does this tell us? First, notice that the entirety of our two-dimensional space (all of <script type="math/tex">\mathbb{R}^2</script>) has been mapped into a 1x1 square. This is a consequence of the sigmoid function, which only outputs values between 0 and 1. Most of the new space is filled up with gridlines that were close to the decision boundaries in the input space. All the other gridlines (extending off to <script type="math/tex">\pm \infty</script> in both directions) have been squished up against the sides of the 1x1 square, which explains why all the data is also concentrated around the edges. We can think of this as a kind of fish-eye effect: the new space magnifies the parts of the old space which were adjacent to the decision boundaries (like the middle of a fish-eye lens) and pushes everything else out of the way. Why does this work? Loosely, you can think of the space around the decision boundaries as the most “interesting” parts of the data: it’s the space that the two perceptrons in the first layer are least confident about classifying. So it makes sense to enhance our view of that part of the space. Since a perceptron is more confident in its predictions the further you get away from a decision boundary, the space far away from a decision boundary is boring and predictable (pun intended), so we can safely ignore it.</p>
+<p>Now it’s easy to see why all the data has become concentrated around the edges: that’s where the gridlines went too! We can think of this as a kind of fish-eye effect: the new space magnifies the parts of the old space which were adjacent to the decision boundaries (like the middle of a fish-eye lens) and pushes everything else out of the way. Why does this work for training neural networks? Loosely, you can think of the space around the decision boundaries as the most “interesting” parts of the data: it’s the space that the two perceptrons in the first layer are least confident about classifying, so it makes sense to enhance our view of that part of the space. Since a perceptron is more confident in its predictions the farther you get away from a decision boundary, the space far away from a decision boundary is boring and predictable, so we can safely ignore it.</p>
 
-<p>Notice also that the gridlines are all S-shaped, like the sigmoid curve (which owes its name to its peculiar S-shape). In fact, this is a consequence of using the sigmoid as the activation function. So does the useful “fish-eye” transformation depend on our choice of activation function? Let’s consider what would happen if we instead used a step function as the activation. Since the step function outputs only 0 or 1 for any input, every point in the input space would be mapped to one of four points in the new space: (0,0), (1,0), (0,1) and (1,1), the corners of the unit square. These correspond to the four possible output combinations of the two perceptrons in the first layer. For each input data point, the second layer perceptron will receive one of those four corners as input and can use only that information to decide how to classify the point. This reduces the problem to a statistical average problem: what fraction of points in each corner belong to each class? We can conclude that if we were to use step activation, some nuances in the data would certainly be lost, and sigmoid activation seems better. On the other hand, it is definitely possible for a two layer perceptron to achieve good accuracy on this particular data set using step activation.</p>
+<p>In the abstract, we can think of this effect as being the result of some transformation applied to the input space, which just so happens to be useful for classifying the data <sup id="fnref:3blue1brown"><a href="#fn:3blue1brown" class="footnote">1</a></sup>. One of the best ways to understand a transformation is to play with it. In our case, the transformation is computed by the hidden layer perceptrons, and so there are 4 parameters to play with: <script type="math/tex">w_{0,0}, w_{0,1}</script> control the first perceptron and <script type="math/tex">w_{1,0}, w_{1,1}</script>. What happens when you change the weights of the hidden layer? Can you find other values for the weights that also yield linearly separable data? Try it out for yourself:</p>
 
-<p>Ok, where are we now? Our clever layer-1 perceptrons found a non-linear transformation of the input space that yields a new space in which the data is more linearly separable than before. In this new space, we can easily eyeball a linear solution to the above classification, and a perceptron should have no trouble finding it either. Here’s one possible solution:</p>
+<p><br /></p>
+
+<script type="text/javascript" src="https://cdn.plot.ly/plotly-1.31.2.min.js"></script>
+
+<div>
+    <style>
+        ul > .perceptron-parameters {
+            width: 30%;
+            margin: auto;
+            list-style: none;
+        }
+        ul > li > label {
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 400;
+        }
+        ul > li > input[type=text] {
+            font-size: 16px;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 400;
+            width: 40px;
+            border: 0;
+            background-color: #fdfdfd;
+        }
+        #plot {
+            width: 600px;
+            margin: auto;
+            height: 600px;
+            padding-bottom: 10px;
+        }
+    </style>
+    <ul class="perceptron-parameters">
+        <li>
+            <label>w<sub>0,0</sub> </label>
+            <input id="w00" type="range" min="-10" max="10" value="10" step="0.1" oninput="updatePerceptrons(); updatePlot();" />
+            <input type="text" id="w00Text" value="10" readonly="" />
+        </li>
+        <li>
+            <label>w<sub>0,1</sub> </label>
+            <input id="w01" type="range" min="-10" max="10" value="-1" step="0.1" oninput="updatePerceptrons(); updatePlot();" />
+            <input type="text" id="w01Text" value="-1" readonly="" />
+        </li>
+        <li>
+            <label>w<sub>1,0</sub> </label>
+            <input id="w10" type="range" min="-10" max="10" value="-1" step="0.1" oninput="updatePerceptrons(); updatePlot();" />
+            <input type="text" id="w10Text" value="-1" readonly="" />
+        </li>
+        <li>
+            <label>w<sub>1,1</sub> </label>
+            <input id="w11" type="range" min="-10" max="10" value="10" step="0.1" oninput="updatePerceptrons(); updatePlot();" />
+            <input type="text" id="w11Text" value="10" readonly="" />
+        </li>
+    </ul>
+    <div id="plot"></div>
+</div>
+
+<script type="text/javascript">
+    function sigmoid(x) {
+        return 1 / (1 + Math.exp(-1 * x));
+    }
+
+    function perceptron(weights, x) {
+        return sigmoid(dot(weights, x));
+    }
+
+    function dot(x, y) {
+        if (x.length !== y.length) {
+            throw new Error("Length mismatch");
+        }
+        return x.map((_, i) => x[i] * y[i]).reduce((acc, val) => acc + val, 0);
+    }
+
+    function transform(perceptrons, inputs) {
+        return inputs.map((x) => perceptrons.map((w) => perceptron(w, x)));
+    }
+
+    function range(n) {
+        var r = Array(n);
+        for (let i=0; i<n; i++) {
+            r[i] = i;
+        }
+        return r;
+    }
+
+    function linspace(min, max, num) {
+        var step = (max - min) / (num - 1);
+        return range(num).map((s) => min + s * step);
+    }
+
+    function first(pair) {
+        return pair[0];
+    }
+
+    function second(pair) {
+        return pair[1];
+    }
+
+    var deepBlue = "#040273";
+    var rust = "#a83c09";
+
+    var numGridlines = 100;
+
+    var xValues = linspace(-2.5, 2.5, numGridlines);
+    var yValues = linspace(-1.5, 1.5, numGridlines);
+
+    var perceptrons = [
+        [10, -1],
+        [-1, 10],
+    ];
+
+    var data1 = [
+        [ 2.29249034,  0.48881005],
+        [ 0.71026699,  1.05553444],
+        [ 0.05407310,  0.25795342],
+        [ 0.58828165,  0.88524424],
+        [ 0.29349415,  0.10895031],
+        [ 0.03172679,  1.27263986],
+        [ 1.07144790,  0.41581801],
+    ];
+    var data0 = [
+        [-0.60754770, -0.12613641],
+        [-0.68460636,  0.92871475],
+        [-1.84440103, -0.46700242],
+        [-1.01700702, -0.13369303],
+        [-0.43818550,  0.49344349],
+        [-0.19900912, -1.27498361],
+        [ 1.55067923, -0.31137892],
+        [-1.37923991,  1.37140879],
+        [ 0.02771165, -0.32039958],
+        [-0.84617041, -0.43342892],
+        [-1.33703450,  0.20917217],
+        [-1.42432130, -0.55347685],
+        [ 0.07479864, -0.50561983],
+    ];
+
+    function generateTraces(perceptrons, data0, data1, xValues, yValues) {
+        var gridlinesX = yValues.map((y) => xValues.map((x) => [x, y]))
+            .map((gx) => transform(perceptrons, gx))
+            .map((gx) => {
+                return {
+                    x: gx.map(first),
+                    y: gx.map(second),
+                    mode: 'lines',
+                    line: {
+                        color: deepBlue,
+                        width: 1,
+                    },
+                };
+            });
+
+        var gridlinesY = xValues.map((x) => yValues.map((y) => [x, y]))
+            .map((gy) => transform(perceptrons, gy))
+            .map((gy) => {
+                return {
+                    x: gy.map(first),
+                    y: gy.map(second),
+                    mode: 'lines',
+                    line: {
+                        color: rust,
+                        width: 1,
+                    },
+                };
+            });
+
+        var td0 = transform(perceptrons, data0);
+        var td1 = transform(perceptrons, data1);
+
+        return [{
+            x: td0.map(first),
+            y: td0.map(second),
+            mode: 'markers',
+            marker: {
+                color: "#0000ff",
+                size: 10,
+            },
+        },
+        {
+            x: td1.map(first),
+            y: td1.map(second),
+            mode: 'markers',
+            marker: {
+                color: "#ff0000",
+                size: 10,
+            },
+        }]
+        .concat(gridlinesX).concat(gridlinesY);
+    }
+
+    var layout = {
+        showlegend: false,
+        // width: 600,
+        // height: 600,
+        autosize: true,
+        position: 'center',
+        xaxis: {
+            showgrid: false,
+            title: 'Perceptron #0 output',
+        },
+        yaxis: {
+            showgrid: false,
+            title: 'Perceptron #1 output',
+        },
+        margin: {
+            t:20, r:20, b:40, l:40,
+            pad: 0,
+        },
+    };
+
+    var options = {
+        displayModeBar: false,
+        staticPlot: true,
+    };
+
+    Plotly.newPlot('plot', generateTraces(perceptrons, data0, data1, xValues, yValues), layout, options);
+
+    function updatePerceptrons() {
+        perceptrons[0][0] = document.getElementById("w00").value;
+        perceptrons[0][1] = document.getElementById("w01").value;
+        perceptrons[1][0] = document.getElementById("w10").value;
+        perceptrons[1][1] = document.getElementById("w11").value;
+
+        document.getElementById("w00Text").value = perceptrons[0][0];
+        document.getElementById("w01Text").value = perceptrons[0][1];
+        document.getElementById("w10Text").value = perceptrons[1][0];
+        document.getElementById("w11Text").value = perceptrons[1][1];
+    }
+
+    function updatePlot() {
+        var numTraces = xValues.length + yValues.length + 2; // 2 extra ones for the data scatter traces
+        Plotly.deleteTraces('plot', range(numTraces));
+        Plotly.addTraces('plot', generateTraces(perceptrons, data0, data1, xValues, yValues));
+    }
+</script>
+
+<p>There is a lot you can learn from playing with these perceptrons, so I’ll just point out one interesting observation. You may have noticed that, in general, the bigger you make the weights (in absolute value) the “sharper” the fish-eye effect. In other words, the gridlines in the center of the space get more spread out and everything else gets even more squished up against the sides of the square. This reflects the fact that larger weights cause the sigmoid to sharpen and become more like a step function.</p>
+
+<p>Notice also that the gridlines are all S-shaped, like the sigmoid curve (which owes its name to its peculiar S-shape). In fact, this is a consequence of using the sigmoid as the activation function. So does this nice “fish-eye” transformation depend on our choice of activation function? Let’s consider what would happen if we instead used a step function as the activation. Since the step function outputs only 0 or 1 for any input, every point in the input space would be mapped to one of four points in the new space: (0,0), (1,0), (0,1) and (1,1), the corners of the unit square. These correspond to the four possible output combinations of the two perceptrons in the first layer. Here’s what that looks like:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+
+<span class="k">def</span> <span class="nf">perceptron_step</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">step</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">weights</span><span class="p">))</span>
+
+<span class="n">nl_transform_step</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="n">perceptron_step</span><span class="p">(</span><span class="n">w0</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">perceptron_step</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">x</span><span class="p">)],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+
+<span class="n">data_t_step</span> <span class="o">=</span> <span class="n">nl_transform_step</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">data_t_step_0</span> <span class="o">=</span> <span class="n">data_t_step</span><span class="p">[</span><span class="n">label</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">data_t_step_1</span> <span class="o">=</span> <span class="n">data_t_step</span><span class="p">[</span><span class="n">label</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="n">n_gridlines</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">gridline_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n_gridlines</span><span class="p">)</span>
+<span class="n">gridline_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">n_gridlines</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">glx</span> <span class="ow">in</span> <span class="n">gridline_x</span><span class="p">:</span>
+    <span class="n">g_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_gridlines</span><span class="p">)</span> <span class="o">+</span> <span class="n">glx</span><span class="p">,</span> <span class="n">gridline_y</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">g_t</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">g_t</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'xkcd:rust'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">gly</span> <span class="ow">in</span> <span class="n">gridline_y</span><span class="p">:</span>
+    <span class="n">g_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">gridline_x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_gridlines</span><span class="p">)</span> <span class="o">+</span> <span class="n">gly</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">g_t</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">g_t</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'xkcd:deep blue'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_0</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #0'</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #1'</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">"$x_0$"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">"$x_1$"</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">glx</span> <span class="ow">in</span> <span class="n">gridline_x</span><span class="p">:</span>
+    <span class="n">g_t</span> <span class="o">=</span> <span class="n">nl_transform_step</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_gridlines</span><span class="p">)</span> <span class="o">+</span> <span class="n">glx</span><span class="p">,</span> <span class="n">gridline_y</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">g_t</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">g_t</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'xkcd:rust'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">gly</span> <span class="ow">in</span> <span class="n">gridline_y</span><span class="p">:</span>
+    <span class="n">g_t</span> <span class="o">=</span> <span class="n">nl_transform_step</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">gridline_x</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_gridlines</span><span class="p">)</span> <span class="o">+</span> <span class="n">gly</span><span class="p">])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">g_t</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">g_t</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'xkcd:deep blue'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_t_step_0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_t_step_0</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #0'</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_t_step_1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_t_step_1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #1'</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'Perceptron #0 output'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'Perceptron #1 output'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_17_1.png" alt="png" /></p>
+
+<p>What this means is that for each input data point, the second layer perceptron will receive one of those four corners as input and can use only that information to decide how to classify the point. This reduces the problem to a statistical average problem: what fraction of points in each corner belong to each class? We can conclude that if we were to use step activation, lots of information would certainly be lost, and thus sigmoid activation seems better. On the other hand, it is definitely possible for a two layer perceptron to achieve good accuracy on this particular data set even using step activation.</p>
+
+<p>Ok, where are we now? Our hidden layer perceptrons found a non-linear transformation of the input space that yields a new space in which the data is more linearly separable than before. In this new space, we can easily eyeball a linear solution to the above classification, and a perceptron should have no trouble finding it either. Here’s one possible solution:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">decision_boundary_bias</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">x0</span><span class="p">):</span>
     <span class="k">return</span> <span class="o">-</span><span class="mf">1.</span> <span class="o">*</span> <span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">bias</span><span class="o">/</span><span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
 
-<span class="n">t2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">t2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 <span class="n">w2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
 <span class="n">b2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.2</span>
 
@@ -271,7 +597,7 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_11_1.png" alt="png" /></p>
+<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_19_1.png" alt="png" /></p>
 
 <p>We can visually verify that this final decision boundary will correctly classify all the points in the transformed space. What will this line have to look like in the input space? Scroll back up and take a look at how the data is laid out: the final decision boundary definitely can’t be a straight line! In fact it’s going to have to be very curved, pulling a tight right-angle turn near the point (0,0). We can visualise the final decision boundary by inverting the non-linear transformation that we applied to the data:</p>
 
@@ -289,7 +615,7 @@
 <span class="n">t2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
 <span class="n">db2</span> <span class="o">=</span> <span class="n">nl_transform_inv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">t2</span><span class="p">,</span> <span class="n">decision_boundary_bias</span><span class="p">(</span><span class="n">w2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">t2</span><span class="p">)])</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_0</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #0'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data_1</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data_1</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Class #1'</span><span class="p">)</span>
@@ -301,18 +627,16 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_13_2.png" alt="png" /></p>
+<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_21_2.png" alt="png" /></p>
 
-<p>I’ve also plotted the original decision boundaries so that you can compare them with the final decision boundary. From this vantage point, it’s clear that the final decision boundary is something like a weighted blend of the two boundaries from the first layer. This “blending” idea is usually the way people talk about multi-layer perceptrons, but to me it’s a little unsatisfying. It is hard to intuitively see how such a simple algorithm could be smart enough to figure out a way to shape and position this tricky curved decision boundary that separates the data in the input space. But if we look at what the perceptron in the second layer is actually “seeing”, it’s clear that it only has to solve the same problem that perceptrons always solve: find a line in space that separates the data. The space has changed, not the algorithm.</p>
-
-<p>As an aside, if you take the blending analogy further then another way to think about a multi-layer perceptron is as a kind of <a href="https://en.wikipedia.org/wiki/Ensemble_learning">ensemble method</a>. An ensemble method is a technique for taking predictions from a bunch of lousy models and producing a kind of weighted average that is more correct more often than any of the individual models. One example is something called a random forest, where you create a group of decision trees, train each one on only a small subset of the data, and then use the trees’ collective predictions as a “vote” to decide how to classify each point. Another example is a technique called [boosting](https://en.wikipedia.org/wiki/Boosting_(machine_learning) (the idea behind <a href="https://en.wikipedia.org/wiki/AdaBoost">AdaBoost</a>), in which you train successive models on the data where the previous model made the most mistakes. In our case, we can think of the first layer of the perceptron as an ensemble of lousy perceptrons, except instead of just voting or averaging classifiers, we also do something a little like boosting: we focus in on the areas where the ensemble is least confident and train new models on those regions.</p>
+<p>I’ve also plotted the original decision boundaries so that you can compare them with the final decision boundary. From this vantage point, it’s clear that the final decision boundary is something like a weighted blend of the two boundaries from the first layer. This “blending” idea is usually the way people talk about multi-layer perceptrons, but to me it’s a little unsatisfying <sup id="fnref:ensembles"><a href="#fn:ensembles" class="footnote">2</a></sup>. It is hard to intuitively see how such a simple algorithm could be smart enough to figure out a way to shape and position this tricky curved decision boundary that separates the data in the input space. But if we look at what the perceptron in the second layer is actually “seeing”, it’s clear that it only has to solve the same problem that perceptrons always solve: find a line in space that separates the data. The space has changed, not the algorithm.</p>
 
 <p>Alright, one last visualisation to complete the picture. The plot above shows the decision boundary of the final perceptron, which is really just a contour line along which it predicts a constant <script type="math/tex">\hat{y}</script> = 0.5. However, when building a predictive model you have the flexibility of choosing any activation threshold you want for the decision boundary. So what do the other contour lines look like in the original input space?</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">perceptron_contour</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="n">bias</span><span class="p">)</span>
 
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">()</span>
 
 <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
@@ -332,11 +656,24 @@
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_15_1.png" alt="png" /></p>
+<p><img src="http://localhost:4000/assets/2017-12-17-seeing-like-a-perceptron/output_23_1.png" alt="png" /></p>
 
 <p>Here you can see the <script type="math/tex">\hat{y}</script> = 0.5 decision boundary as before, along with a range of other possible choices. Note that in this scenario, everything above and to the right of a given boundary would be classified as class #1, and everything else as class #0. In the transformed space, these lines correspond to straight lines parallel to the decision boundary of the final perceptron.</p>
 
-<p>To summarise what we have found: the first layer of the perceptron actually defines a non-linear transformation that yields a new data-set that is more linearly separable by blowing up the area around the decision boundaries in the input space and squishing down the rest. And since we have an algorithm for training perceptrons, they can find this transformation <em>by themselves</em>. Then we can apply another perceptron to find the linear separation in the new, transformed space. I think that’s super cool, and it gets at the heart of what machine learning really is. It’s not some magical black box hack, nor is it a rough simulation of brain activity. It’s a principled system for finding non-linear transformations that make the data easier to work with.</p>
+<p>To summarise what we have found: the perceptrons in the hidden layer of the neural network created a non-linear transformation that yielded a new space. This new space made the data easier to classify by zooming in on the areas of low confidence around the decision boundaries in the input space. The perceptron in the output layer effectively gets to work at higher magnification in the new space, and so it should be able to achieve better accuracy than any of the perceptrons in the hidden layer. Now imagine stacking layer upon layer of perceptrons in this manner, iteratively finding new transformations that zoom in further and further on the most difficult parts of the dataset, and you can begin to feel how complex the final decision boundary might become. And since we have algorithms for training perceptrons, they can find these transformation <em>by themselves</em>. I think that’s super cool, and it gets at the heart of what machine learning with neural networks really is: it’s not some magical black box hack, nor is it necessarily a simulation of brain activity. It’s a principled system for finding non-linear transformations that make the data easier to work with.</p>
+
+<p><br /></p>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:3blue1brown">
+      <p>For a great introduction to the mathematics of transformations, I highly recommend 3Blue1Brown’s video series on the <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab">Essence of Linear Algebra</a>.&nbsp;<a href="#fnref:3blue1brown" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:ensembles">
+      <p>As an aside, if you take the blending analogy further then another way to think about a multi-layer perceptron is as a kind of <a href="https://en.wikipedia.org/wiki/Ensemble_learning">ensemble method</a>. An ensemble method is a technique for taking predictions from a bunch of lousy models and producing a kind of weighted average that is more correct more often than any of the individual models. One example is something called a random forest, where you create a group of decision trees, train each one on only a small subset of the data, and then use the trees’ collective predictions as a “vote” to decide how to classify each point. Another example is a technique called <a href="https://en.wikipedia.org/wiki/Boosting_(machine_learning)">boosting</a> (the idea behind <a href="https://en.wikipedia.org/wiki/AdaBoost">AdaBoost</a>), in which you train successive models on the data where the previous model made the most mistakes. In our case, we can think of the first layer of the perceptron as an ensemble of lousy perceptrons, except instead of just voting or averaging classifiers, we also do something a little like boosting: we focus in on the areas where the ensemble is least confident and train new models on those regions.&nbsp;<a href="#fnref:ensembles" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
 
   </div>
 
