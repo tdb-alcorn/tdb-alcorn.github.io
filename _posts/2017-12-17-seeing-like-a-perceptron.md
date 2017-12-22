@@ -207,7 +207,7 @@ In the abstract, we can think of this effect as being the result of some transfo
 
 <div>
     <style>
-        ul > .perceptron-parameters {
+        .perceptron-parameters {
             width: 30%;
             margin: auto;
             list-style: none;
