@@ -5,7 +5,6 @@ header:
     image: /assets/img/small-wreck-tom.jpg
 excerpt: It's maths, not magic
 ---
-<!-- <script type="text/javascript" src="https://cdn.plot.ly/plotly-basic-1.31.2.min.js"></script> -->
 
 Perceptrons were one of the earliest supervised learning models, and though they went out of fashion for about 50 years, they've more recently experienced a huge comeback in the form of multi-layer perceptrons, also known as neural networks. You may have heard about how neural networks can now perform all kinds of marvelous and perhaps unsettling feats, such as [recognising speech](https://research.googleblog.com/2015/08/the-neural-networks-behind-google-voice.html), [captioning images](https://cs.stanford.edu/people/karpathy/deepimagesent/) and [beating humans at games](http://googleresearch.blogspot.com/2016/01/alphago-mastering-ancient-game-of-go.html). But they are surrounded by an unfortunate aura of mystery and magic, and I sometimes hear people complain that the study of neural networks lacks sound theoretical foundations. To debunk this idea, I'll explore some visualisations of what a perceptron "sees" when it makes a decision, which will help us understand why chaining together multiple layers of perceptrons is such an effective technique.
 
@@ -203,22 +202,19 @@ Now it's easy to see why all the data has become concentrated around the edges: 
 
 In the abstract, we can think of this effect as being the result of some transformation applied to the input space, which just so happens to be useful for classifying the data [^3blue1brown]. One of the best ways to understand a transformation is to play with it. In our case, the transformation is computed by the hidden layer perceptrons, and so there are 4 parameters to play with: $$w_{0,0}, w_{0,1}$$ control the first perceptron and $$w_{1,0}, w_{1,1}$$. What happens when you change the weights of the hidden layer? Can you find other values for the weights that also yield linearly separable data? Try it out for yourself:
 
-<br>
-
 <div>
     <head>
-    <!-- <script type="text/javascript" src="https://cdn.plot.ly/plotly-1.31.2.min.js"></script> -->
-        <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG"> -->
-        <!-- </script> -->
-        <!-- <script type="text/javascript" src="https://cdn.plot.ly/plotly-basic-1.31.2.min.js"></script> -->
         <link rel='stylesheet' src='https://cdn.pydata.org/bokeh/release/bokeh-0.12.9.min.css'>
         <script type='text/javascript' src='https://cdn.pydata.org/bokeh/release/bokeh-0.12.9.min.js'></script>
         <script type='text/javascript' src='https://cdn.pydata.org/bokeh/release/bokeh-api-0.12.9.min.js'></script>
     </head>
     <style>
+        .perceptron-parameters-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
         .perceptron-parameters {
-            width: 30%;
-            margin: auto;
             list-style: none;
         }
         ul > li > label {
@@ -234,34 +230,36 @@ In the abstract, we can think of this effect as being the result of some transfo
             background-color: #fdfdfd;
         }
         #plot {
-            width: 600px;
+            width: 75%;
             margin: auto;
-            height: 600px;
+            /* height: 600px; */
             padding-bottom: 10px;
         }
     </style>
-    <ul class="perceptron-parameters">
-        <li>
-            <label>w<sub>0,0</sub> </label>
-            <input id="w00" type="range" min="-10" max="10" value="10" step="0.1" oninput="updatePerceptrons(); updatePlot();">
-            <input type="text" id="w00Text" value="10" readonly>
-        </li>
-        <li>
-            <label>w<sub>0,1</sub> </label>
-            <input id="w01" type="range" min="-10" max="10" value="-1" step="0.1" oninput="updatePerceptrons(); updatePlot();">
-            <input type="text" id="w01Text" value="-1" readonly>
-        </li>
-        <li>
-            <label>w<sub>1,0</sub> </label>
-            <input id="w10" type="range" min="-10" max="10" value="-1" step="0.1" oninput="updatePerceptrons(); updatePlot();">
-            <input type="text" id="w10Text" value="-1" readonly>
-        </li>
-        <li>
-            <label>w<sub>1,1</sub> </label>
-            <input id="w11" type="range" min="-10" max="10" value="10" step="0.1" oninput="updatePerceptrons(); updatePlot();">
-            <input type="text" id="w11Text" value="10" readonly>
-        </li>
-    </ul>
+    <div class='perceptron-parameters-container'>
+        <ul class="perceptron-parameters">
+            <li>
+                <label>w<sub>0,0</sub> </label>
+                <input id="w00" type="range" min="-10" max="10" value="10" step="0.1" oninput="updatePerceptrons(); updatePlot();">
+                <input type="text" id="w00Text" value="10" readonly>
+            </li>
+            <li>
+                <label>w<sub>0,1</sub> </label>
+                <input id="w01" type="range" min="-10" max="10" value="-1" step="0.1" oninput="updatePerceptrons(); updatePlot();">
+                <input type="text" id="w01Text" value="-1" readonly>
+            </li>
+            <li>
+                <label>w<sub>1,0</sub> </label>
+                <input id="w10" type="range" min="-10" max="10" value="-1" step="0.1" oninput="updatePerceptrons(); updatePlot();">
+                <input type="text" id="w10Text" value="-1" readonly>
+            </li>
+            <li>
+                <label>w<sub>1,1</sub> </label>
+                <input id="w11" type="range" min="-10" max="10" value="10" step="0.1" oninput="updatePerceptrons(); updatePlot();">
+                <input type="text" id="w11Text" value="10" readonly>
+            </li>
+        </ul>
+    </div>
     <div id="plot"></div>
 </div>
 
@@ -293,11 +291,6 @@ In the abstract, we can think of this effect as being the result of some transfo
         return r;
     }
 
-    function linspace(min, max, num) {
-        var step = (max - min) / (num - 1);
-        return range(num).map((s) => min + s * step);
-    }
-
     function first(pair) {
         return pair[0];
     }
@@ -311,12 +304,8 @@ In the abstract, we can think of this effect as being the result of some transfo
 
     var numGridlines = 100;
 
-    // var xValues = linspace(-2.5, 2.5, numGridlines);
-    // var yValues = linspace(-1.5, 1.5, numGridlines);
     var xValues = Bokeh.LinAlg.linspace(-2.5, 2.5, numGridlines);
     var yValues = Bokeh.LinAlg.linspace(-1.5, 1.5, numGridlines);
-
-    var source = new Bokeh.ColumnDataSource({ data: { x: xValues, y: yValues } });
 
     var perceptrons = [
         [10, -1],
@@ -441,97 +430,21 @@ In the abstract, we can think of this effect as being the result of some transfo
         };
     }
 
-    function generateTraces(plot, perceptrons, data0, data1, xValues, yValues) {
-        var gridlinesX = yValues.map((y) => xValues.map((x) => [x, y]))
-            .map((gx) => transform(perceptrons, gx))
-            .map((gx) => {
-                plot.add_glyph(new Bokeh.Line({
-                        x: { field: "x" },
-                        y: { field: "y" },
-                        line_color: deepBlue,
-                        line_width: 1,
-                    }),
-                    new Bokeh.ColumnDataSource({ data: { x: gx.map(first), y: gx.map(second) } })
-                );
-            });
-
-        var gridlinesY = xValues.map((x) => yValues.map((y) => [x, y]))
-            .map((gy) => transform(perceptrons, gy))
-            .map((gy) => {
-                plot.add_glyph(new Bokeh.Line({
-                        x: { field: "x" },
-                        y: { field: "y" },
-                        line_color: rust,
-                        line_width: 1,
-                    }),
-                    new Bokeh.ColumnDataSource({ data: { x: gy.map(first), y: gy.map(second) } })
-                );
-            });
-
-        var td0 = transform(perceptrons, data0);
-        var td1 = transform(perceptrons, data1);
-
-        return [{
-            x: td0.map(first),
-            y: td0.map(second),
-            mode: 'markers',
-            marker: {
-                color: "#0000ff",
-                size: 10,
-            },
-        },
-        {
-            x: td1.map(first),
-            y: td1.map(second),
-            mode: 'markers',
-            marker: {
-                color: "#ff0000",
-                size: 10,
-            },
-        }]
-        .concat(gridlinesX).concat(gridlinesY);
-    }
-
-    var layout = {
-        showlegend: false,
-        // width: 600,
-        // height: 600,
-        autosize: true,
-        position: 'center',
-        xaxis: {
-            showgrid: false,
-            title: 'Perceptron #0 output',
-        },
-        yaxis: {
-            showgrid: false,
-            title: 'Perceptron #1 output',
-        },
-        margin: {
-            t:20, r:20, b:40, l:40,
-            pad: 0,
-        },
-    };
-
-    var options = {
-        displayModeBar: false,
-        staticPlot: true,
-    };
-
     // create some ranges for the plot
     var xdr = new Bokeh.Range1d({ start: 0, end: 1 });
     var ydr = Bokeh.Range1d(0, 1);
 
     // make the plot
     var plot = new Bokeh.Plot({
-        // title: "BokehJS Plot",
         x_range: xdr,
         y_range: ydr,
+        sizing_mode: 'scale_width',
         // plot_width: 400,
         // plot_height: 400,
         background_fill_color: "#fdfdfd"
     });
-    var xaxis = new Bokeh.LinearAxis({ axis_line_color: null });
-    var yaxis = new Bokeh.LinearAxis({ axis_line_color: null });
+    var xaxis = new Bokeh.LinearAxis({ axis_line_color: null, axis_label: "Perceptron #0 output" });
+    var yaxis = new Bokeh.LinearAxis({ axis_line_color: null, axis_label: "Perceptron #1 output" });
     plot.add_layout(xaxis, "below");
     plot.add_layout(yaxis, "left");
 
@@ -542,7 +455,6 @@ In the abstract, we can think of this effect as being the result of some transfo
     var div = document.getElementById("plot");
     Bokeh.embed.add_document_standalone(doc, div);
 
-    // Plotly.newPlot('plot', generateTraces(perceptrons, data0, data1, xValues, yValues), layout, options);
 
     function updatePerceptrons() {
         perceptrons[0][0] = document.getElementById("w00").value;
@@ -557,10 +469,6 @@ In the abstract, we can think of this effect as being the result of some transfo
     }
 
     function updatePlot() {
-        // var numTraces = xValues.length + yValues.length + 2; // 2 extra ones for the data scatter traces
-        // Plotly.deleteTraces('plot', range(numTraces));
-        // Plotly.addTraces('plot', generateTraces(perceptrons, data0, data1, xValues, yValues));
-        // generateTraces(plot, perceptrons, data0, data1, xValues, yValues);
         updateSources(sources, perceptrons, data0, data1, xValues, yValues);
     }
 </script>
