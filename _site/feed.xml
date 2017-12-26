@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-12-23T10:32:39+11:00</updated><id>http://localhost:4000/</id><title type="html">Tom Alcorn’s Blog</title><subtitle>Math, machine learning, and generative art.</subtitle><author><name>Tom Alcorn</name></author><entry><title type="html">Seeing Like A Perceptron</title><link href="http://localhost:4000/2017/12/17/seeing-like-a-perceptron.html" rel="alternate" type="text/html" title="Seeing Like A Perceptron" /><published>2017-12-18T10:59:53+11:00</published><updated>2017-12-18T10:59:53+11:00</updated><id>http://localhost:4000/2017/12/17/seeing-like-a-perceptron</id><content type="html" xml:base="http://localhost:4000/2017/12/17/seeing-like-a-perceptron.html">&lt;p&gt;Perceptrons were one of the earliest supervised learning models, and though they went out of fashion for about 50 years, they’ve more recently experienced a huge comeback in the form of multi-layer perceptrons, also known as neural networks. You may have heard about how neural networks can now perform all kinds of marvelous and perhaps unsettling feats, such as &lt;a href=&quot;https://research.googleblog.com/2015/08/the-neural-networks-behind-google-voice.html&quot;&gt;recognising speech&lt;/a&gt;, &lt;a href=&quot;https://cs.stanford.edu/people/karpathy/deepimagesent/&quot;&gt;captioning images&lt;/a&gt; and &lt;a href=&quot;http://googleresearch.blogspot.com/2016/01/alphago-mastering-ancient-game-of-go.html&quot;&gt;beating humans at games&lt;/a&gt;. But they are surrounded by an unfortunate aura of mystery and magic, and I sometimes hear people complain that the study of neural networks lacks sound theoretical foundations. To debunk this idea, I’ll explore some visualisations of what a perceptron “sees” when it makes a decision, which will help us understand why chaining together multiple layers of perceptrons is such an effective technique.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-12-26T21:52:28+11:00</updated><id>http://localhost:4000/</id><title type="html">Tom Alcorn’s Blog</title><subtitle>Math, machine learning, and generative art.</subtitle><author><name>Tom Alcorn</name></author><entry><title type="html">Seeing Like A Perceptron</title><link href="http://localhost:4000/2017/12/17/seeing-like-a-perceptron.html" rel="alternate" type="text/html" title="Seeing Like A Perceptron" /><published>2017-12-18T10:59:53+11:00</published><updated>2017-12-18T10:59:53+11:00</updated><id>http://localhost:4000/2017/12/17/seeing-like-a-perceptron</id><content type="html" xml:base="http://localhost:4000/2017/12/17/seeing-like-a-perceptron.html">&lt;!-- &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.plot.ly/plotly-basic-1.31.2.min.js&quot;&gt;&lt;/script&gt; --&gt;
+
+&lt;p&gt;Perceptrons were one of the earliest supervised learning models, and though they went out of fashion for about 50 years, they’ve more recently experienced a huge comeback in the form of multi-layer perceptrons, also known as neural networks. You may have heard about how neural networks can now perform all kinds of marvelous and perhaps unsettling feats, such as &lt;a href=&quot;https://research.googleblog.com/2015/08/the-neural-networks-behind-google-voice.html&quot;&gt;recognising speech&lt;/a&gt;, &lt;a href=&quot;https://cs.stanford.edu/people/karpathy/deepimagesent/&quot;&gt;captioning images&lt;/a&gt; and &lt;a href=&quot;http://googleresearch.blogspot.com/2016/01/alphago-mastering-ancient-game-of-go.html&quot;&gt;beating humans at games&lt;/a&gt;. But they are surrounded by an unfortunate aura of mystery and magic, and I sometimes hear people complain that the study of neural networks lacks sound theoretical foundations. To debunk this idea, I’ll explore some visualisations of what a perceptron “sees” when it makes a decision, which will help us understand why chaining together multiple layers of perceptrons is such an effective technique.&lt;/p&gt;
 
 &lt;p&gt;First, some background: a perceptron is a type of linear model that learns a decision boundary by averaging together data points until it reaches a stable solution. I’ll only be considering perceptrons with two input nodes, but the intuition we’ll develop applies equally well to higher dimensional data, although it becomes substantially trickier to visualise. For our purposes, a trained perceptron is a function of an input vector &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; that produces a prediction &lt;script type=&quot;math/tex&quot;&gt;\hat{y}&lt;/script&gt;, between 0 and 1. You will usually see this function written as
 &lt;script type=&quot;math/tex&quot;&gt;\hat{y} = \sigma(Wx + b)&lt;/script&gt;
@@ -177,9 +179,16 @@ Essentially, a perceptron takes a weighted average of its input nodes and then c
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.plot.ly/plotly-1.31.2.min.js&quot;&gt;&lt;/script&gt;
-
 &lt;div&gt;
+    &lt;head&gt;
+    &lt;!-- &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.plot.ly/plotly-1.31.2.min.js&quot;&gt;&lt;/script&gt; --&gt;
+        &lt;!-- &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG&quot;&gt; --&gt;
+        &lt;!-- &lt;/script&gt; --&gt;
+        &lt;!-- &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.plot.ly/plotly-basic-1.31.2.min.js&quot;&gt;&lt;/script&gt; --&gt;
+        &lt;link rel=&quot;stylesheet&quot; src=&quot;https://cdn.pydata.org/bokeh/release/bokeh-0.12.9.min.css&quot; /&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.pydata.org/bokeh/release/bokeh-0.12.9.min.js&quot;&gt;&lt;/script&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.pydata.org/bokeh/release/bokeh-api-0.12.9.min.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
     &lt;style&gt;
         .perceptron-parameters {
             width: 30%;
@@ -276,8 +285,12 @@ Essentially, a perceptron takes a weighted average of its input nodes and then c
 
     var numGridlines = 100;
 
-    var xValues = linspace(-2.5, 2.5, numGridlines);
-    var yValues = linspace(-1.5, 1.5, numGridlines);
+    // var xValues = linspace(-2.5, 2.5, numGridlines);
+    // var yValues = linspace(-1.5, 1.5, numGridlines);
+    var xValues = Bokeh.LinAlg.linspace(-2.5, 2.5, numGridlines);
+    var yValues = Bokeh.LinAlg.linspace(-1.5, 1.5, numGridlines);
+
+    var source = new Bokeh.ColumnDataSource({ data: { x: xValues, y: yValues } });
 
     var perceptrons = [
         [10, -1],
@@ -309,33 +322,124 @@ Essentially, a perceptron takes a weighted average of its input nodes and then c
         [ 0.07479864, -0.50561983],
     ];
 
-    function generateTraces(perceptrons, data0, data1, xValues, yValues) {
+    var sources = {
+        xGridlines: [],
+        yGridlines: [],
+        transformed: [{}, {}],
+    };
+
+    function generateSources(plot, sources, perceptrons, data0, data1, xValues, yValues) {
         var gridlinesX = yValues.map((y) =&gt; xValues.map((x) =&gt; [x, y]))
             .map((gx) =&gt; transform(perceptrons, gx))
             .map((gx) =&gt; {
-                return {
-                    x: gx.map(first),
-                    y: gx.map(second),
-                    mode: 'lines',
-                    line: {
-                        color: deepBlue,
-                        width: 1,
-                    },
-                };
+                var source = new Bokeh.ColumnDataSource({ data: { x: gx.map(first), y: gx.map(second) } });
+                plot.add_glyph(new Bokeh.Line({
+                        x: { field: &quot;x&quot; },
+                        y: { field: &quot;y&quot; },
+                        line_color: deepBlue,
+                        line_width: 1,
+                    }), 
+                    source
+                );
+                sources.xGridlines.push(source);
             });
 
         var gridlinesY = xValues.map((x) =&gt; yValues.map((y) =&gt; [x, y]))
             .map((gy) =&gt; transform(perceptrons, gy))
             .map((gy) =&gt; {
-                return {
-                    x: gy.map(first),
-                    y: gy.map(second),
-                    mode: 'lines',
-                    line: {
-                        color: rust,
-                        width: 1,
-                    },
-                };
+                var source = new Bokeh.ColumnDataSource({ data: { x: gy.map(first), y: gy.map(second) } });
+                plot.add_glyph(new Bokeh.Line({
+                        x: { field: &quot;x&quot; },
+                        y: { field: &quot;y&quot; },
+                        line_color: rust,
+                        line_width: 1,
+                    }),
+                    source
+                );
+                sources.yGridlines.push(source);
+            });
+
+        var td0 = transform(perceptrons, data0);
+        var td1 = transform(perceptrons, data1);
+
+        sources.transformed[0] = new Bokeh.ColumnDataSource({
+            data: {
+                x: td0.map(first),
+                y: td0.map(second),
+            },
+        });
+        plot.add_glyph(new Bokeh.Circle({
+            x: { field: &quot;x&quot; },
+            y: { field: &quot;y&quot; },
+            line_color: &quot;#0000ff&quot;,
+            fill_color: &quot;#0000ff&quot;,
+            size: 10,
+        }), sources.transformed[0]);
+        sources.transformed[1] = new Bokeh.ColumnDataSource({
+            data: {
+                x: td1.map(first),
+                y: td1.map(second),
+            },
+        });
+        plot.add_glyph(new Bokeh.Circle({
+            x: { field: &quot;x&quot; },
+            y: { field: &quot;y&quot; },
+            line_color: &quot;#ff0000&quot;,
+            fill_color: &quot;#ff0000&quot;,
+            size: 10,
+        }), sources.transformed[1]);
+    }
+
+    function updateSources(sources, perceptrons, data0, data1, xValues, yValues) {
+        var gridlinesX = yValues.map((y) =&gt; xValues.map((x) =&gt; [x, y]))
+            .map((gx) =&gt; transform(perceptrons, gx))
+            .map((gx, i) =&gt; {
+                sources.xGridlines[i].data = { x: gx.map(first), y: gx.map(second) };
+            });
+        var gridlinesY = xValues.map((x) =&gt; yValues.map((y) =&gt; [x, y]))
+            .map((gy) =&gt; transform(perceptrons, gy))
+            .map((gy, i) =&gt; {
+                sources.yGridlines[i].data = { x: gy.map(first), y: gy.map(second) };
+            });
+
+        var td0 = transform(perceptrons, data0);
+        var td1 = transform(perceptrons, data1);
+
+        sources.transformed[0].data = {
+            x: td0.map(first),
+            y: td0.map(second),
+        };
+        sources.transformed[1].data = {
+            x: td1.map(first),
+            y: td1.map(second),
+        };
+    }
+
+    function generateTraces(plot, perceptrons, data0, data1, xValues, yValues) {
+        var gridlinesX = yValues.map((y) =&gt; xValues.map((x) =&gt; [x, y]))
+            .map((gx) =&gt; transform(perceptrons, gx))
+            .map((gx) =&gt; {
+                plot.add_glyph(new Bokeh.Line({
+                        x: { field: &quot;x&quot; },
+                        y: { field: &quot;y&quot; },
+                        line_color: deepBlue,
+                        line_width: 1,
+                    }),
+                    new Bokeh.ColumnDataSource({ data: { x: gx.map(first), y: gx.map(second) } })
+                );
+            });
+
+        var gridlinesY = xValues.map((x) =&gt; yValues.map((y) =&gt; [x, y]))
+            .map((gy) =&gt; transform(perceptrons, gy))
+            .map((gy) =&gt; {
+                plot.add_glyph(new Bokeh.Line({
+                        x: { field: &quot;x&quot; },
+                        y: { field: &quot;y&quot; },
+                        line_color: rust,
+                        line_width: 1,
+                    }),
+                    new Bokeh.ColumnDataSource({ data: { x: gy.map(first), y: gy.map(second) } })
+                );
             });
 
         var td0 = transform(perceptrons, data0);
@@ -387,7 +491,32 @@ Essentially, a perceptron takes a weighted average of its input nodes and then c
         staticPlot: true,
     };
 
-    Plotly.newPlot('plot', generateTraces(perceptrons, data0, data1, xValues, yValues), layout, options);
+    // create some ranges for the plot
+    var xdr = new Bokeh.Range1d({ start: 0, end: 1 });
+    var ydr = Bokeh.Range1d(0, 1);
+
+    // make the plot
+    var plot = new Bokeh.Plot({
+        // title: &quot;BokehJS Plot&quot;,
+        x_range: xdr,
+        y_range: ydr,
+        // plot_width: 400,
+        // plot_height: 400,
+        background_fill_color: &quot;#fdfdfd&quot;
+    });
+    var xaxis = new Bokeh.LinearAxis({ axis_line_color: null });
+    var yaxis = new Bokeh.LinearAxis({ axis_line_color: null });
+    plot.add_layout(xaxis, &quot;below&quot;);
+    plot.add_layout(yaxis, &quot;left&quot;);
+
+    generateSources(plot, sources, perceptrons, data0, data1, xValues, yValues);
+
+    var doc = new Bokeh.Document();
+    doc.add_root(plot);
+    var div = document.getElementById(&quot;plot&quot;);
+    Bokeh.embed.add_document_standalone(doc, div);
+
+    // Plotly.newPlot('plot', generateTraces(perceptrons, data0, data1, xValues, yValues), layout, options);
 
     function updatePerceptrons() {
         perceptrons[0][0] = document.getElementById(&quot;w00&quot;).value;
@@ -402,9 +531,11 @@ Essentially, a perceptron takes a weighted average of its input nodes and then c
     }
 
     function updatePlot() {
-        var numTraces = xValues.length + yValues.length + 2; // 2 extra ones for the data scatter traces
-        Plotly.deleteTraces('plot', range(numTraces));
-        Plotly.addTraces('plot', generateTraces(perceptrons, data0, data1, xValues, yValues));
+        // var numTraces = xValues.length + yValues.length + 2; // 2 extra ones for the data scatter traces
+        // Plotly.deleteTraces('plot', range(numTraces));
+        // Plotly.addTraces('plot', generateTraces(perceptrons, data0, data1, xValues, yValues));
+        // generateTraces(plot, perceptrons, data0, data1, xValues, yValues);
+        updateSources(sources, perceptrons, data0, data1, xValues, yValues);
     }
 &lt;/script&gt;
 
