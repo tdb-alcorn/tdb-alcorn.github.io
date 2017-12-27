@@ -1,8 +1,8 @@
 ---
 layout: post
 date:   2017-12-17 15:59:53 -0800
-header:
-    image: /assets/img/small-wreck-tom.jpg
+image: /assets/img/small-wreck-tom.jpg
+title: Seeing Like A Perceptron
 excerpt: It's maths, not magic
 ---
 

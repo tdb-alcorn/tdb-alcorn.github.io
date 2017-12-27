@@ -6,8 +6,8 @@
   <body>
 
     <!-- <div class="hero" style="background-image: url({{ '/assets/img/small-wreck-tom.jpg' | relative_url }})"> -->
-    {% if page.header.image %}
-      <div class="hero" style="background-image: url({{ page.header.image | relative_url }})">
+    {% if page.image %}
+      <div class="hero" style="background-image: url({{ page.image | relative_url }})">
         {% include header.html %}
       </div>
     {% else %}
