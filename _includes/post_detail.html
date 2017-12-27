@@ -18,7 +18,7 @@
     {{ content }}
   </div>
 
-  {% if site.disqus.shortname %}
+  {% if jekyll.environment == 'production' and site.disqus.shortname %}
     {% include disqus_comments.html %}
   {% endif %}
 </article>

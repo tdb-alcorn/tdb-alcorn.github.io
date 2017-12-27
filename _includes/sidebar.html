@@ -26,4 +26,10 @@
         </div>
       </nav>
     {% endif %}
+
+    {% if site.github_username %}
+    <p>
+      <a href="https://github.com/{{ site.github_username }}"><span class="icon icon--github">{% include icon-github.svg %}</span></a>
+    </p>
+    {% endif %}
 </div>
