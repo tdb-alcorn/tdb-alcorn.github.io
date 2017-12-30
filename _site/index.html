@@ -129,30 +129,38 @@
     <head>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.min.js"></script>
         <script type="text/javascript" src="http://localhost:4000/assets/lib/vector.js"></script>
+        <script type="text/javascript" src="http://localhost:4000/assets/lib/hairsDraw.js"></script>
     </head>
     <style>
+        #colorPointPreview {
+            width: 20px;
+            height: 20px;
+            background-color: hsl(180, 50%, 50%);
+            display: inline-block;
+        }
     </style>
     <div id="canvas">
     </div>
     <div id="controls">
         <form>
-            <label>Color:</label><input id="colorPoint" type="range" value="128" min="0" max="255" oninput="updateControls();" />
-            <label>Color variance:</label><input id="colorVariance" type="range" value="128" min="0" max="128" oninput="updateControls();" />
+            <label>Color:</label><input id="colorPoint" type="range" value="180" min="0" max="359" oninput="updateControls();" /><div id="colorPointPreview"></div>
+            <label>Color variance:</label><input id="colorVariance" type="range" value="30" min="0" max="180" oninput="updateControls();" />
             <label>Max length:</label><input id="globalMaxLength" type="range" value="15" min="1" max="50" oninput="updateControls();" />
         </form>
         <button onclick="reset();">Reset</button>
         <button onclick="saveToFile();">Save</button>
         <button onclick="showFilePicker();">Load</button>
-        <input id="filePicker" type="file" style="display:none;" onchange="loadFromFile(); hideFilePicker();" />
+        <input id="filePicker" type="file" style="display:none;" oninput="loadFromFile(); hideFilePicker();" />
     </div>
     <script type="text/javascript">
-        var colorPoint = 128;
-        var colorVariance = 128;
+        var colorPoint = 180;
+        var colorVariance = 30;
         var globalMaxLength = 15;
         function updateControls() {
-            colorPoint = document.getElementById('colorPoint').value;
-            colorVariance = document.getElementById('colorVariance').value;
-            globalMaxLength = document.getElementById('globalMaxLength').value;
+            colorPoint = parseInt(document.getElementById('colorPoint').value);
+            document.getElementById('colorPointPreview').style.backgroundColor = 'hsl(' + colorPoint + ', 50%, 50%)';
+            colorVariance = parseInt(document.getElementById('colorVariance').value);
+            globalMaxLength = parseInt(document.getElementById('globalMaxLength').value);
         }
         function Hair(start, end, p0, p1) {
             this.start = start;
@@ -165,19 +173,15 @@
             }
             this.wiggliness = random(0.5, 1.0);
             this.growiness = random(1, 1.10);
-            this.maxLength = random(3,globalMaxLength);
-            this.hairColor = round(colorPoint + random(-colorVariance, colorVariance)) % 255;
-            // this.wiggliness = random(0.4);
-            // this.growiness = random(1, 1.2);
-            // this.maxLength = random(20,80);
-            // this.hairColor = round(random(80, 255));
+            this.maxLength = random(3, globalMaxLength);
+            this.hairColor = round(colorPoint + random(-colorVariance, colorVariance)) % 360;
             function draw() {
                 var h = this.end.subtract(this.start);
                 var l = h.rotate(this.f * PI/2);
                 var r = h.rotate(-this.f * PI/2);
                 var m0 = l.scale(this.p0).add(h.scale(1./3.)).add(this.start);
                 var m1 = r.scale(this.p1).add(h.scale(-1./3.)).add(this.end);
-                stroke(this.hairColor, 120, 255);
+                stroke(this.hairColor, 50, 100);
                 bezier(this.start.x, this.start.y, m0.x, m0.y, m1.x, m1.y, this.end.x, this.end.y);
             }
             function update(timestep) {
@@ -193,8 +197,8 @@
         }
         Hair.rehydrate = function(obj) {
             var h = Object.assign(new Hair(), obj);
-            h.start = Object.assign(new Vector(), h.start);
-            h.end = Object.assign(new Vector(), h.end);
+            h.start = Vector.rehydrate(h.start);
+            h.end = Vector.rehydrate(h.end);
             return h;
         }
         var timestep = 0.05;
@@ -213,12 +217,15 @@
             var file = document.getElementById('filePicker').files[0];
             var reader = new FileReader();
             reader.onload = function(e) {
-                hairs = JSON.parse(e.target.result);
-                for (var i=0, len=hairs.length; i<len; i++) {
-                    hairs[i] = Hair.rehydrate(hairs[i]);
-                }
+                loadFromJSON(e.target.result);
             };
             reader.readAsText(file);
+        }
+        function loadFromJSON(json) {
+            hairs = JSON.parse(json);
+            for (var i=0, len=hairs.length; i<len; i++) {
+                hairs[i] = Hair.rehydrate(hairs[i]);
+            }
         }
         function saveToFile() {
             saveJSON(hairs, 'hairs.json');
@@ -234,8 +241,9 @@
             strokeWeight(3);
             strokeCap(ROUND);
             strokeJoin(ROUND);
-            colorMode(HSB, 255);
+            colorMode(HSB);
             center = new Vector(width/2.0, height/2.0);
+            loadFromJSON(hairsDrawJson);
         }
         function draw() {
             background(0);
@@ -245,15 +253,14 @@
             for (var i=0, len=hairs.length; i<len; i++) {
                 hairs[i].update(timestep);
             }
-            // if (mouseIsPressed) {
-            //     var r = new Vector(mouseX, mouseY);
-            //     hairs.push(new Hair(r, r.add(((new Vector(10, 0)).rotate(random(2*PI))))));
-            // }
         }
         function mouseDragged() {
             var r = new Vector(mouseX, mouseY);
-            hairs.push(new Hair(r, r.add(((new Vector(10, 0)).rotate(random(2*PI))))));
-            return false;
+            // Only draw hairs if mouse is on canvas.
+            if (r.within(0, 0, width, height)) {
+                hairs.push(new Hair(r, r.add(((new Vector(10, 0)).rotate(random(2*PI))))));
+            }
+            return true;
         }
     </script>
 </div>

@@ -39,6 +39,11 @@ function Vector(x, y) {
       var s = Math.sin(theta);
       return new Vector(c * this.x - s * this.y, s * this.x + c * this.y);
     }
+    
+    function within(x0, y0, x1, y1) {
+        // Returns true if vector is contained within bounds, otherwise false.
+        return this.x >= x0 && this.x <= x1 && this.y >= y0 && this.y <= y1;
+    }
 
     this.distanceTo = distanceTo;
     this.length = length;
@@ -49,4 +54,8 @@ function Vector(x, y) {
     this.setLength = setLength;
     this.toString = toString;
     this.rotate = rotate;
+    this.within = within;
+}
+Vector.rehydrate = function(obj) {
+    return Object.assign(new Vector(), obj); 
 }
