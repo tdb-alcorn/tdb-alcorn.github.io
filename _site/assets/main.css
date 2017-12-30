@@ -139,6 +139,8 @@ pre > code { border: 0; padding-right: 0; padding-left: 0; }
 
 .post-link { display: block; font-size: 24px; }
 
+.post-excerpt { font-size: 14px; color: #424242; }
+
 /** Posts */
 .post-header { margin-bottom: 30px; }
 

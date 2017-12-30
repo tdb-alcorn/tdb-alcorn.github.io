@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-12-30T14:52:49+11:00</updated><id>http://localhost:4000/</id><title type="html">Tom Alcorn’s Blog</title><subtitle>Math, machine learning, and generative art.</subtitle><author><name>Tom Alcorn</name></author><entry><title type="html">It’s A Hair Brush</title><link href="http://localhost:4000/2017/12/29/its-a-hair-brush.html" rel="alternate" type="text/html" title="It's A Hair Brush" /><published>2017-12-30T13:10:53+11:00</published><updated>2017-12-30T13:10:53+11:00</updated><id>http://localhost:4000/2017/12/29/its-a-hair-brush</id><content type="html" xml:base="http://localhost:4000/2017/12/29/its-a-hair-brush.html">&lt;div id=&quot;p5-container&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-12-30T20:49:18+11:00</updated><id>http://localhost:4000/</id><title type="html">Tom Alcorn’s Blog</title><subtitle>Math, machine learning, and generative art.</subtitle><author><name>Tom Alcorn</name></author><entry><title type="html">It’s A Hair Brush</title><link href="http://localhost:4000/2017/12/29/its-a-hair-brush.html" rel="alternate" type="text/html" title="It's A Hair Brush" /><published>2017-12-30T13:10:53+11:00</published><updated>2017-12-30T13:10:53+11:00</updated><id>http://localhost:4000/2017/12/29/its-a-hair-brush</id><content type="html" xml:base="http://localhost:4000/2017/12/29/its-a-hair-brush.html">&lt;div id=&quot;p5-container&quot;&gt;
     &lt;head&gt;
         &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.min.js&quot;&gt;&lt;/script&gt;
         &lt;script type=&quot;text/javascript&quot; src=&quot;http://localhost:4000/assets/lib/vector.js&quot;&gt;&lt;/script&gt;
@@ -7,7 +7,26 @@
     &lt;/style&gt;
     &lt;div id=&quot;canvas&quot;&gt;
     &lt;/div&gt;
+    &lt;div id=&quot;controls&quot;&gt;
+        &lt;form&gt;
+            &lt;label&gt;Color:&lt;/label&gt;&lt;input id=&quot;colorPoint&quot; type=&quot;range&quot; value=&quot;128&quot; min=&quot;0&quot; max=&quot;255&quot; oninput=&quot;updateControls();&quot; /&gt;
+            &lt;label&gt;Color variance:&lt;/label&gt;&lt;input id=&quot;colorVariance&quot; type=&quot;range&quot; value=&quot;128&quot; min=&quot;0&quot; max=&quot;128&quot; oninput=&quot;updateControls();&quot; /&gt;
+            &lt;label&gt;Max length:&lt;/label&gt;&lt;input id=&quot;globalMaxLength&quot; type=&quot;range&quot; value=&quot;15&quot; min=&quot;1&quot; max=&quot;50&quot; oninput=&quot;updateControls();&quot; /&gt;
+        &lt;/form&gt;
+        &lt;button onclick=&quot;reset();&quot;&gt;Reset&lt;/button&gt;
+        &lt;button onclick=&quot;saveToFile();&quot;&gt;Save&lt;/button&gt;
+        &lt;button onclick=&quot;showFilePicker();&quot;&gt;Load&lt;/button&gt;
+        &lt;input id=&quot;filePicker&quot; type=&quot;file&quot; style=&quot;display:none;&quot; onchange=&quot;loadFromFile(); hideFilePicker();&quot; /&gt;
+    &lt;/div&gt;
     &lt;script type=&quot;text/javascript&quot;&gt;
+        var colorPoint = 128;
+        var colorVariance = 128;
+        var globalMaxLength = 15;
+        function updateControls() {
+            colorPoint = document.getElementById('colorPoint').value;
+            colorVariance = document.getElementById('colorVariance').value;
+            globalMaxLength = document.getElementById('globalMaxLength').value;
+        }
         function Hair(start, end, p0, p1) {
             this.start = start;
             this.end = end;
@@ -19,8 +38,8 @@
             }
             this.wiggliness = random(0.5, 1.0);
             this.growiness = random(1, 1.10);
-            this.maxLength = random(3,15);
-            this.hairColor = round(random(0, 255));
+            this.maxLength = random(3,globalMaxLength);
+            this.hairColor = round(colorPoint + random(-colorVariance, colorVariance)) % 255;
             // this.wiggliness = random(0.4);
             // this.growiness = random(1, 1.2);
             // this.maxLength = random(20,80);
@@ -45,12 +64,42 @@
             this.draw = draw;
             this.update = update;
         }
+        Hair.rehydrate = function(obj) {
+            var h = Object.assign(new Hair(), obj);
+            h.start = Object.assign(new Vector(), h.start);
+            h.end = Object.assign(new Vector(), h.end);
+            return h;
+        }
         var timestep = 0.05;
         var hairs = [];
         var center;
+        function reset() {
+            hairs = [];
+        }
+        function showFilePicker() {
+            document.getElementById('filePicker').style.display = 'inline';
+        }
+        function hideFilePicker() {
+            document.getElementById('filePicker').style.display = 'none';
+        }
+        function loadFromFile() {
+            var file = document.getElementById('filePicker').files[0];
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                hairs = JSON.parse(e.target.result);
+                for (var i=0, len=hairs.length; i&lt;len; i++) {
+                    hairs[i] = Hair.rehydrate(hairs[i]);
+                }
+            };
+            reader.readAsText(file);
+        }
+        function saveToFile() {
+            saveJSON(hairs, 'hairs.json');
+        }
         function setup() {
+            var parentWidth = document.getElementById('canvas').offsetWidth;
             randomSeed(42);
-            var canvas = createCanvas(600, 400);
+            var canvas = createCanvas(parentWidth, Math.round(parentWidth*0.618));
             canvas.parent('canvas');
             stroke(255);
             fill(0, 0);
@@ -69,10 +118,15 @@
             for (var i=0, len=hairs.length; i&lt;len; i++) {
                 hairs[i].update(timestep);
             }
-            if (mouseIsPressed) {
-                var r = new Vector(mouseX, mouseY);
-                hairs.push(new Hair(r, r.add(((new Vector(10, 0)).rotate(random(2*PI))))));
-            }
+            // if (mouseIsPressed) {
+            //     var r = new Vector(mouseX, mouseY);
+            //     hairs.push(new Hair(r, r.add(((new Vector(10, 0)).rotate(random(2*PI))))));
+            // }
+        }
+        function mouseDragged() {
+            var r = new Vector(mouseX, mouseY);
+            hairs.push(new Hair(r, r.add(((new Vector(10, 0)).rotate(random(2*PI))))));
+            return false;
         }
     &lt;/script&gt;
 &lt;/div&gt;</content><author><name>Tom Alcorn</name></author><summary type="html">Wherein I appeal to your inner kindergartener</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/assets/img/small-wreck-tom.jpg" /></entry><entry><title type="html">Seeing Like A Perceptron</title><link href="http://localhost:4000/2017/12/17/seeing-like-a-perceptron.html" rel="alternate" type="text/html" title="Seeing Like A Perceptron" /><published>2017-12-18T10:59:53+11:00</published><updated>2017-12-18T10:59:53+11:00</updated><id>http://localhost:4000/2017/12/17/seeing-like-a-perceptron</id><content type="html" xml:base="http://localhost:4000/2017/12/17/seeing-like-a-perceptron.html">&lt;p&gt;Perceptrons were one of the earliest supervised learning models, and though they went out of fashion for about 50 years, they’ve more recently experienced a huge comeback in the form of multi-layer perceptrons, also known as neural networks. You may have heard about how neural networks can now perform all kinds of marvelous and perhaps unsettling feats, such as &lt;a href=&quot;https://research.googleblog.com/2015/08/the-neural-networks-behind-google-voice.html&quot;&gt;recognising speech&lt;/a&gt;, &lt;a href=&quot;https://cs.stanford.edu/people/karpathy/deepimagesent/&quot;&gt;captioning images&lt;/a&gt; and &lt;a href=&quot;http://googleresearch.blogspot.com/2016/01/alphago-mastering-ancient-game-of-go.html&quot;&gt;beating humans at games&lt;/a&gt;. But they are surrounded by an unfortunate aura of mystery and magic, and I sometimes hear people complain that the study of neural networks lacks sound theoretical foundations. To debunk this idea, I’ll explore some visualisations of what a perceptron “sees” when it makes a decision, which will help us understand why chaining together multiple layers of perceptrons is such an effective technique.&lt;/p&gt;

@@ -7,27 +7,27 @@ function Vector(x, y) {
     }
     
     function length() {
-      return Math.pow(x*x + y*y, 0.5);
+      return Math.pow(this.x*this.x + this.y*this.y, 0.5);
     }
     
     function lengthSq() {
-        return x*x + y*y;
+        return this.x*this.x + this.y*this.y;
     }
     
     function subtract(other) {
-      return new Vector(x - other.x, y - other.y);
+      return new Vector(this.x - other.x, this.y - other.y);
     }
     
     function add(other) {
-      return new Vector(other.x + x, other.y + y);
+      return new Vector(other.x + this.x, other.y + this.y);
     }
     
     function scale(c) {
-      return new Vector(c * x, c * y);
+      return new Vector(c * this.x, c * this.y);
     }
     
     function setLength(l) {
-      return this.scale(l/this.length());
+      return this.scale(l*l/this.lengthSq());
     }
     
     function toString() {
