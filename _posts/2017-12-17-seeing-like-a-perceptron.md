@@ -12,7 +12,7 @@ First, some background: a perceptron is a type of linear model that learns a dec
 $$\hat{y} = \sigma(Wx + b)$$
 where $$\sigma$$ is the [sigmoid activation function](https://en.wikipedia.org/wiki/Sigmoid_function), $$W$$ is a vector of weights connecting units in the network, $$x$$ is the input vector (the data) and $$b$$ is a bias term. However, the bias won't qualitatively change the following visualisations so I am going to set all biases to 0 to keep things simple. So, in the 2 input case this breaks down as
 $$\hat{y} = \sigma(w_0 x_0 + w_1 x_1)$$
-Essentially, a perceptron takes a weighted average of its input nodes and then computes the sigmoid of the result, yielding a result between 0 and 1. Why the sigmoid? This may seem myterious and arbitrary to you right now, but we are going to pry open the black box to see why the sigmoid works as an activation function.
+Essentially, a perceptron takes a weighted average of its input nodes and then computes the sigmoid of the result, yielding a result between 0 and 1. Why the sigmoid? This may seem mysterious and arbitrary to you right now, but we are going to pry open the black box to see why the sigmoid works as an activation function.
 
 We'll be thinking about the perceptron as a classifer, which means that we use the output of the perceptron to partition the input space into two classes, **class \#0** and **class \#1**. The line between the classes is the decision boundary, and it corresponds to a contour (line of constant value) of the perceptron function, typically something like $$\hat{y}$$ = 0.5. 
 

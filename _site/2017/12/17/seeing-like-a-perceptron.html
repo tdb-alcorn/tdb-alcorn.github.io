@@ -122,7 +122,7 @@
 <script type="math/tex">\hat{y} = \sigma(Wx + b)</script>
 where <script type="math/tex">\sigma</script> is the <a href="https://en.wikipedia.org/wiki/Sigmoid_function">sigmoid activation function</a>, <script type="math/tex">W</script> is a vector of weights connecting units in the network, <script type="math/tex">x</script> is the input vector (the data) and <script type="math/tex">b</script> is a bias term. However, the bias won’t qualitatively change the following visualisations so I am going to set all biases to 0 to keep things simple. So, in the 2 input case this breaks down as
 <script type="math/tex">\hat{y} = \sigma(w_0 x_0 + w_1 x_1)</script>
-Essentially, a perceptron takes a weighted average of its input nodes and then computes the sigmoid of the result, yielding a result between 0 and 1. Why the sigmoid? This may seem myterious and arbitrary to you right now, but we are going to pry open the black box to see why the sigmoid works as an activation function.</p>
+Essentially, a perceptron takes a weighted average of its input nodes and then computes the sigmoid of the result, yielding a result between 0 and 1. Why the sigmoid? This may seem mysterious and arbitrary to you right now, but we are going to pry open the black box to see why the sigmoid works as an activation function.</p>
 
 <p>We’ll be thinking about the perceptron as a classifer, which means that we use the output of the perceptron to partition the input space into two classes, <strong>class #0</strong> and <strong>class #1</strong>. The line between the classes is the decision boundary, and it corresponds to a contour (line of constant value) of the perceptron function, typically something like <script type="math/tex">\hat{y}</script> = 0.5.</p>
 

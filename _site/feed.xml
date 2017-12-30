@@ -1,10 +1,87 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-12-28T09:26:09+11:00</updated><id>http://localhost:4000/</id><title type="html">Tom Alcorn’s Blog</title><subtitle>Math, machine learning, and generative art.</subtitle><author><name>Tom Alcorn</name></author><entry><title type="html">Seeing Like A Perceptron</title><link href="http://localhost:4000/2017/12/17/seeing-like-a-perceptron.html" rel="alternate" type="text/html" title="Seeing Like A Perceptron" /><published>2017-12-18T10:59:53+11:00</published><updated>2017-12-18T10:59:53+11:00</updated><id>http://localhost:4000/2017/12/17/seeing-like-a-perceptron</id><content type="html" xml:base="http://localhost:4000/2017/12/17/seeing-like-a-perceptron.html">&lt;p&gt;Perceptrons were one of the earliest supervised learning models, and though they went out of fashion for about 50 years, they’ve more recently experienced a huge comeback in the form of multi-layer perceptrons, also known as neural networks. You may have heard about how neural networks can now perform all kinds of marvelous and perhaps unsettling feats, such as &lt;a href=&quot;https://research.googleblog.com/2015/08/the-neural-networks-behind-google-voice.html&quot;&gt;recognising speech&lt;/a&gt;, &lt;a href=&quot;https://cs.stanford.edu/people/karpathy/deepimagesent/&quot;&gt;captioning images&lt;/a&gt; and &lt;a href=&quot;http://googleresearch.blogspot.com/2016/01/alphago-mastering-ancient-game-of-go.html&quot;&gt;beating humans at games&lt;/a&gt;. But they are surrounded by an unfortunate aura of mystery and magic, and I sometimes hear people complain that the study of neural networks lacks sound theoretical foundations. To debunk this idea, I’ll explore some visualisations of what a perceptron “sees” when it makes a decision, which will help us understand why chaining together multiple layers of perceptrons is such an effective technique.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-12-30T14:52:49+11:00</updated><id>http://localhost:4000/</id><title type="html">Tom Alcorn’s Blog</title><subtitle>Math, machine learning, and generative art.</subtitle><author><name>Tom Alcorn</name></author><entry><title type="html">It’s A Hair Brush</title><link href="http://localhost:4000/2017/12/29/its-a-hair-brush.html" rel="alternate" type="text/html" title="It's A Hair Brush" /><published>2017-12-30T13:10:53+11:00</published><updated>2017-12-30T13:10:53+11:00</updated><id>http://localhost:4000/2017/12/29/its-a-hair-brush</id><content type="html" xml:base="http://localhost:4000/2017/12/29/its-a-hair-brush.html">&lt;div id=&quot;p5-container&quot;&gt;
+    &lt;head&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.min.js&quot;&gt;&lt;/script&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;http://localhost:4000/assets/lib/vector.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;style&gt;
+    &lt;/style&gt;
+    &lt;div id=&quot;canvas&quot;&gt;
+    &lt;/div&gt;
+    &lt;script type=&quot;text/javascript&quot;&gt;
+        function Hair(start, end, p0, p1) {
+            this.start = start;
+            this.end = end;
+            this.p0 = p0 || random(0.5);
+            this.p1 = p1 || random(0.5);
+            this.f = 1;
+            if (random(1) &gt; 0.5) {
+                this.f = -1;
+            }
+            this.wiggliness = random(0.5, 1.0);
+            this.growiness = random(1, 1.10);
+            this.maxLength = random(3,15);
+            this.hairColor = round(random(0, 255));
+            // this.wiggliness = random(0.4);
+            // this.growiness = random(1, 1.2);
+            // this.maxLength = random(20,80);
+            // this.hairColor = round(random(80, 255));
+            function draw() {
+                var h = this.end.subtract(this.start);
+                var l = h.rotate(this.f * PI/2);
+                var r = h.rotate(-this.f * PI/2);
+                var m0 = l.scale(this.p0).add(h.scale(1./3.)).add(this.start);
+                var m1 = r.scale(this.p1).add(h.scale(-1./3.)).add(this.end);
+                stroke(this.hairColor, 120, 255);
+                bezier(this.start.x, this.start.y, m0.x, m0.y, m1.x, m1.y, this.end.x, this.end.y);
+            }
+            function update(timestep) {
+                this.p0 = constrain(this.p0 + this.wiggliness * random(-timestep, timestep), 0, 1);
+                this.p1 = constrain(this.p1 + this.wiggliness * random(-timestep, timestep), 0, 1);
+                var h = this.end.subtract(this.start);
+                if (h.lengthSq() &lt; (this.maxLength*this.maxLength)) {
+                    this.end = this.start.add(h.scale(this.growiness));
+                }
+            }
+            this.draw = draw;
+            this.update = update;
+        }
+        var timestep = 0.05;
+        var hairs = [];
+        var center;
+        function setup() {
+            randomSeed(42);
+            var canvas = createCanvas(600, 400);
+            canvas.parent('canvas');
+            stroke(255);
+            fill(0, 0);
+            background(0);
+            strokeWeight(3);
+            strokeCap(ROUND);
+            strokeJoin(ROUND);
+            colorMode(HSB, 255);
+            center = new Vector(width/2.0, height/2.0);
+        }
+        function draw() {
+            background(0);
+            for (var i=0, len=hairs.length; i&lt;len; i++) {
+                hairs[i].draw();
+            }
+            for (var i=0, len=hairs.length; i&lt;len; i++) {
+                hairs[i].update(timestep);
+            }
+            if (mouseIsPressed) {
+                var r = new Vector(mouseX, mouseY);
+                hairs.push(new Hair(r, r.add(((new Vector(10, 0)).rotate(random(2*PI))))));
+            }
+        }
+    &lt;/script&gt;
+&lt;/div&gt;</content><author><name>Tom Alcorn</name></author><summary type="html">Wherein I appeal to your inner kindergartener</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/assets/img/small-wreck-tom.jpg" /></entry><entry><title type="html">Seeing Like A Perceptron</title><link href="http://localhost:4000/2017/12/17/seeing-like-a-perceptron.html" rel="alternate" type="text/html" title="Seeing Like A Perceptron" /><published>2017-12-18T10:59:53+11:00</published><updated>2017-12-18T10:59:53+11:00</updated><id>http://localhost:4000/2017/12/17/seeing-like-a-perceptron</id><content type="html" xml:base="http://localhost:4000/2017/12/17/seeing-like-a-perceptron.html">&lt;p&gt;Perceptrons were one of the earliest supervised learning models, and though they went out of fashion for about 50 years, they’ve more recently experienced a huge comeback in the form of multi-layer perceptrons, also known as neural networks. You may have heard about how neural networks can now perform all kinds of marvelous and perhaps unsettling feats, such as &lt;a href=&quot;https://research.googleblog.com/2015/08/the-neural-networks-behind-google-voice.html&quot;&gt;recognising speech&lt;/a&gt;, &lt;a href=&quot;https://cs.stanford.edu/people/karpathy/deepimagesent/&quot;&gt;captioning images&lt;/a&gt; and &lt;a href=&quot;http://googleresearch.blogspot.com/2016/01/alphago-mastering-ancient-game-of-go.html&quot;&gt;beating humans at games&lt;/a&gt;. But they are surrounded by an unfortunate aura of mystery and magic, and I sometimes hear people complain that the study of neural networks lacks sound theoretical foundations. To debunk this idea, I’ll explore some visualisations of what a perceptron “sees” when it makes a decision, which will help us understand why chaining together multiple layers of perceptrons is such an effective technique.&lt;/p&gt;
 
 &lt;p&gt;First, some background: a perceptron is a type of linear model that learns a decision boundary by averaging together data points until it reaches a stable solution. I’ll only be considering perceptrons with two input nodes, but the intuition we’ll develop applies equally well to higher dimensional data, although it becomes substantially trickier to visualise. For our purposes, a trained perceptron is a function of an input vector &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; that produces a prediction &lt;script type=&quot;math/tex&quot;&gt;\hat{y}&lt;/script&gt;, between 0 and 1. You will usually see this function written as
 &lt;script type=&quot;math/tex&quot;&gt;\hat{y} = \sigma(Wx + b)&lt;/script&gt;
 where &lt;script type=&quot;math/tex&quot;&gt;\sigma&lt;/script&gt; is the &lt;a href=&quot;https://en.wikipedia.org/wiki/Sigmoid_function&quot;&gt;sigmoid activation function&lt;/a&gt;, &lt;script type=&quot;math/tex&quot;&gt;W&lt;/script&gt; is a vector of weights connecting units in the network, &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt; is the input vector (the data) and &lt;script type=&quot;math/tex&quot;&gt;b&lt;/script&gt; is a bias term. However, the bias won’t qualitatively change the following visualisations so I am going to set all biases to 0 to keep things simple. So, in the 2 input case this breaks down as
 &lt;script type=&quot;math/tex&quot;&gt;\hat{y} = \sigma(w_0 x_0 + w_1 x_1)&lt;/script&gt;
-Essentially, a perceptron takes a weighted average of its input nodes and then computes the sigmoid of the result, yielding a result between 0 and 1. Why the sigmoid? This may seem myterious and arbitrary to you right now, but we are going to pry open the black box to see why the sigmoid works as an activation function.&lt;/p&gt;
+Essentially, a perceptron takes a weighted average of its input nodes and then computes the sigmoid of the result, yielding a result between 0 and 1. Why the sigmoid? This may seem mysterious and arbitrary to you right now, but we are going to pry open the black box to see why the sigmoid works as an activation function.&lt;/p&gt;
 
 &lt;p&gt;We’ll be thinking about the perceptron as a classifer, which means that we use the output of the perceptron to partition the input space into two classes, &lt;strong&gt;class #0&lt;/strong&gt; and &lt;strong&gt;class #1&lt;/strong&gt;. The line between the classes is the decision boundary, and it corresponds to a contour (line of constant value) of the perceptron function, typically something like &lt;script type=&quot;math/tex&quot;&gt;\hat{y}&lt;/script&gt; = 0.5.&lt;/p&gt;
 
