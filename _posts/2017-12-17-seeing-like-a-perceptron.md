@@ -207,6 +207,7 @@ In the abstract, we can think of this effect as being the result of some transfo
         <link rel='stylesheet' src='https://cdn.pydata.org/bokeh/release/bokeh-0.12.9.min.css'>
         <script type='text/javascript' src='https://cdn.pydata.org/bokeh/release/bokeh-0.12.9.min.js'></script>
         <script type='text/javascript' src='https://cdn.pydata.org/bokeh/release/bokeh-api-0.12.9.min.js'></script>
+        <script type='text/javascript' src='{{ "/assets/lib/perceptrons.js" | absolute_url }}'></script>
     </head>
     <style>
         .perceptron-parameters-container {
@@ -264,41 +265,6 @@ In the abstract, we can think of this effect as being the result of some transfo
 </div>
 
 <script type="text/javascript">
-    function sigmoid(x) {
-        return 1 / (1 + Math.exp(-1 * x));
-    }
-
-    function perceptron(weights, x) {
-        return sigmoid(dot(weights, x));
-    }
-
-    function dot(x, y) {
-        if (x.length !== y.length) {
-            throw new Error("Length mismatch");
-        }
-        return x.map((_, i) => x[i] * y[i]).reduce((acc, val) => acc + val, 0);
-    }
-
-    function transform(perceptrons, inputs) {
-        return inputs.map((x) => perceptrons.map((w) => perceptron(w, x)));
-    }
-
-    function range(n) {
-        var r = Array(n);
-        for (let i=0; i<n; i++) {
-            r[i] = i;
-        }
-        return r;
-    }
-
-    function first(pair) {
-        return pair[0];
-    }
-
-    function second(pair) {
-        return pair[1];
-    }
-
     var deepBlue = "#040273";
     var rust = "#a83c09";
 

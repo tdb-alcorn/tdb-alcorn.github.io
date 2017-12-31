@@ -1,8 +1,123 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-12-30T22:06:56+11:00</updated><id>http://localhost:4000/</id><title type="html">Tom Alcorn’s Blog</title><subtitle>Math, machine learning, and generative art.</subtitle><author><name>Tom Alcorn</name></author><entry><title type="html">It’s A Hair Brush</title><link href="http://localhost:4000/2017/12/29/its-a-hair-brush.html" rel="alternate" type="text/html" title="It's A Hair Brush" /><published>2017-12-30T13:10:53+11:00</published><updated>2017-12-30T13:10:53+11:00</updated><id>http://localhost:4000/2017/12/29/its-a-hair-brush</id><content type="html" xml:base="http://localhost:4000/2017/12/29/its-a-hair-brush.html">&lt;div id=&quot;p5-container&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.6.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-12-31T21:07:35+11:00</updated><id>http://localhost:4000/</id><title type="html">Tom Alcorn’s Blog</title><subtitle>Math, machine learning, and generative art.</subtitle><author><name>Tom Alcorn</name></author><entry><title type="html">Seeing Like A Perceptron II: Training</title><link href="http://localhost:4000/2017/12/30/seeing-like-a-perceptron-ii-training.html" rel="alternate" type="text/html" title="Seeing Like A Perceptron II: Training" /><published>2017-12-31T15:59:53+11:00</published><updated>2017-12-31T15:59:53+11:00</updated><id>http://localhost:4000/2017/12/30/seeing-like-a-perceptron-ii-training</id><content type="html" xml:base="http://localhost:4000/2017/12/30/seeing-like-a-perceptron-ii-training.html">&lt;div id=&quot;container&quot;&gt;
+    &lt;head&gt;
+        &lt;link rel=&quot;stylesheet&quot; src=&quot;https://cdn.pydata.org/bokeh/release/bokeh-0.12.9.min.css&quot; /&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.pydata.org/bokeh/release/bokeh-0.12.9.min.js&quot;&gt;&lt;/script&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.pydata.org/bokeh/release/bokeh-api-0.12.9.min.js&quot;&gt;&lt;/script&gt;
+        &lt;link rel=&quot;stylesheet&quot; src=&quot;https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css&quot; /&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js&quot;&gt;&lt;/script&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;http://localhost:4000/assets/lib/perceptrons.js&quot;&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;style&gt;
+        #graph {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+    &lt;/style&gt;
+    &lt;label&gt;Epoch&lt;/label&gt;&lt;input id=&quot;epoch&quot; type=&quot;range&quot; min=&quot;0&quot; max=&quot;999&quot; value=&quot;200&quot; step=&quot;1&quot; oninput=&quot;updatePlot();&quot; /&gt;&lt;label id=&quot;epochValue&quot;&gt;200&lt;/label&gt;
+    &lt;div id=&quot;graph&quot;&gt;
+        &lt;div id=&quot;transformedDataPlot&quot;&gt;&lt;/div&gt;
+        &lt;div id=&quot;trainingAccuracyPlot&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script type=&quot;text/javascript&quot;&gt;
+        perceptron = perceptronGenerator(relu);
+        var epoch = 200;
+        var data = new vis.DataSet();
+        data.add({x:0,y:0,z:0,style:0});
+        // var accData = new vis.DataSet();
+        // accData.add({x:0,y:0,z:0,style:0});
+        var options = {
+            width:  '600px',
+            height: '600px',
+            style: 'dot-color',
+            showPerspective: true,
+            showGrid: true,
+            showLegend: false,
+            keepAspectRatio: true,
+            verticalRatio: 1.0,
+            cameraPosition: {
+                horizontal: -0.35,
+                vertical: 0.22,
+                distance: 1.8
+            },
+        };
+        // var accOptions = {
+        //     width: '300px',
+        //     height: '300px',
+        //     // style: 'line',
+        //     legend: false,
+        //     sort: false,
+        //     dataAxis: {
+        //         left: {
+        //             range: {
+        //                 min: 300, max: 800
+        //             }
+        //         }
+        //     },
+        //     // showGrid: true,
+        //     // verticalRatio: 1.0,
+        // };
+        // var accGroups = new vis.DataSet();
+        // accGroups.add({
+        //     id: 0,
+        //     options: {
+        //         style: 'line',
+        //     },
+        // });
+        // accGroups.add({
+        //     id: 1,
+        //     // content: names[3],
+        //     options: {
+        //         style: 'points',
+        //         // drawPoints: {
+        //         //     style: 'circle' // square, circle
+        //         // },
+        //         // shaded: {
+        //         //     orientation: 'top' // top, bottom
+        //         // }
+        //     },
+        // });
+        var graph = new vis.Graph3d(document.getElementById('transformedDataPlot'), data, options);
+        // var accGraph = new vis.Graph2d(document.getElementById('trainingAccuracyPlot'), accData, accGroups, accOptions);
+        var updatePlot;
+        fetch('http://localhost:4000/assets/data/data_0.json').then((response) =&gt; response.json())
+        .then((data0) =&gt; {
+            fetch('http://localhost:4000/assets/data/data_1.json').then((response) =&gt; response.json())
+            .then((data1) =&gt; {
+                fetch('http://localhost:4000/assets/data/weights.json').then((response) =&gt; response.json())
+                .then((weights) =&gt; {
+                    fetch('http://localhost:4000/assets/data/accuracy.json').then((response) =&gt; response.json())
+                    .then((accuracy) =&gt; {
+                        accuracy = accuracy.map((a, i) =&gt; {
+                            return {x: i, y: a, group: 0};
+                        });
+                        plot(data0, data1, weights, accuracy, epoch);
+                        updatePlot = function() {
+                            epoch = parseInt(document.getElementById('epoch').value);
+                            document.getElementById('epochValue').innerText = epoch;
+                            plot(data0, data1, weights, accuracy, epoch);
+                        }
+                    });
+                });
+            });
+        });
+        function plot(data0, data1, weights, accuracy, epoch) {
+            var d = new vis.DataSet();
+            var perceptrons = weights[epoch];
+            var dt0 = transform(perceptrons, data0);
+            var dt1 = transform(perceptrons, data1);
+            dt0.map((x) =&gt; d.add({x:x[0], y:x[1], z:x[2], style:0}));
+            dt1.map((x) =&gt; d.add({x:x[0], y:x[1], z:x[2], style:1}));
+            graph.setData(d);
+            // var accD = new vis.DataSet(accuracy.concat([{x: epoch, y: accuracy[epoch].y, group: 1}]));         
+            // accGraph.setItems(accD);
+        }
+    &lt;/script&gt;
+&lt;/div&gt;</content><author><name>Tom Alcorn</name></author><summary type="html">It's maths, not magic</summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://localhost:4000/assets/img/small-wreck-tom.jpg" /></entry><entry><title type="html">It’s A Hair Brush</title><link href="http://localhost:4000/2017/12/29/its-a-hair-brush.html" rel="alternate" type="text/html" title="It's A Hair Brush" /><published>2017-12-30T13:10:53+11:00</published><updated>2017-12-30T13:10:53+11:00</updated><id>http://localhost:4000/2017/12/29/its-a-hair-brush</id><content type="html" xml:base="http://localhost:4000/2017/12/29/its-a-hair-brush.html">&lt;div id=&quot;p5-container&quot;&gt;
     &lt;head&gt;
         &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.min.js&quot;&gt;&lt;/script&gt;
         &lt;script type=&quot;text/javascript&quot; src=&quot;http://localhost:4000/assets/lib/vector.js&quot;&gt;&lt;/script&gt;
-        &lt;script type=&quot;text/javascript&quot; src=&quot;http://localhost:4000/assets/lib/hairsDraw.js&quot;&gt;&lt;/script&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;http://localhost:4000/assets/data/hairsDraw.js&quot;&gt;&lt;/script&gt;
     &lt;/head&gt;
     &lt;style&gt;
         #colorPointPreview {
@@ -318,6 +433,7 @@ Essentially, a perceptron takes a weighted average of its input nodes and then c
         &lt;link rel=&quot;stylesheet&quot; src=&quot;https://cdn.pydata.org/bokeh/release/bokeh-0.12.9.min.css&quot; /&gt;
         &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.pydata.org/bokeh/release/bokeh-0.12.9.min.js&quot;&gt;&lt;/script&gt;
         &lt;script type=&quot;text/javascript&quot; src=&quot;https://cdn.pydata.org/bokeh/release/bokeh-api-0.12.9.min.js&quot;&gt;&lt;/script&gt;
+        &lt;script type=&quot;text/javascript&quot; src=&quot;http://localhost:4000/assets/lib/perceptrons.js&quot;&gt;&lt;/script&gt;
     &lt;/head&gt;
     &lt;style&gt;
         .perceptron-parameters-container {
@@ -375,41 +491,6 @@ Essentially, a perceptron takes a weighted average of its input nodes and then c
 &lt;/div&gt;
 
 &lt;script type=&quot;text/javascript&quot;&gt;
-    function sigmoid(x) {
-        return 1 / (1 + Math.exp(-1 * x));
-    }
-
-    function perceptron(weights, x) {
-        return sigmoid(dot(weights, x));
-    }
-
-    function dot(x, y) {
-        if (x.length !== y.length) {
-            throw new Error(&quot;Length mismatch&quot;);
-        }
-        return x.map((_, i) =&gt; x[i] * y[i]).reduce((acc, val) =&gt; acc + val, 0);
-    }
-
-    function transform(perceptrons, inputs) {
-        return inputs.map((x) =&gt; perceptrons.map((w) =&gt; perceptron(w, x)));
-    }
-
-    function range(n) {
-        var r = Array(n);
-        for (let i=0; i&lt;n; i++) {
-            r[i] = i;
-        }
-        return r;
-    }
-
-    function first(pair) {
-        return pair[0];
-    }
-
-    function second(pair) {
-        return pair[1];
-    }
-
     var deepBlue = &quot;#040273&quot;;
     var rust = &quot;#a83c09&quot;;
 

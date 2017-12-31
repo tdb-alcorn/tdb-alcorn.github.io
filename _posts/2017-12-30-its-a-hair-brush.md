@@ -10,7 +10,7 @@ excerpt: Wherein I appeal to your inner kindergartener
     <head>
         <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.16/p5.min.js'></script>
         <script type='text/javascript' src='{{ "/assets/lib/vector.js" | absolute_url }}'></script>
-        <script type='text/javascript' src='{{ "/assets/lib/hairsDraw.js" | absolute_url }}'></script>
+        <script type='text/javascript' src='{{ "/assets/data/hairsDraw.js" | absolute_url }}'></script>
     </head>
     <style>
         #colorPointPreview {
