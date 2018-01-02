@@ -3,7 +3,7 @@ function sigmoid(x) {
 }
 
 function relu(x) {
-    return x + Math.abs(x) / 2;
+    return (x + Math.abs(x)) / 2;
 }
 
 function perceptron(weights, x) {
