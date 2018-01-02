@@ -298,7 +298,11 @@ Recall that the function of the output node is to find a decision boundary (in t
 
 <p>Below I’ve provided my neural network implementation so that you can try this out for yourself. It’s a simple network with a single hidden layer, and it uses ReLU activations and sigmoid activation gradients. Most importantly, it keeps a history of all the weights it has learned and the accuracy and mean squared error at each epoch, so that you can play back the training process. Enjoy!</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">def</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
     <span class="k">return</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">X</span><span class="p">))</span>
 
 <span class="k">def</span> <span class="nf">sigmoid_grad</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
@@ -310,7 +314,7 @@ Recall that the function of the output node is to find a decision boundary (in t
 <span class="k">def</span> <span class="nf">relu_grad</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">sigmoid</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">NeuralNetworkWithPCA</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">NeuralNetworkWithHistory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_input</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_hidden</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_output</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">num_epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_input</span> <span class="o">=</span> <span class="n">num_input</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_hidden</span> <span class="o">=</span> <span class="n">num_hidden</span>
@@ -319,7 +323,6 @@ Recall that the function of the output node is to find a decision boundary (in t
         <span class="bp">self</span><span class="o">.</span><span class="n">num_epochs</span> <span class="o">=</span> <span class="n">num_epochs</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">weights_0_1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_input</span><span class="p">,</span> <span class="n">num_hidden</span><span class="p">))</span>
-        <span class="c"># randomly initialise hidden layer weights to start</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">weights_1_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">num_hidden</span><span class="p">,</span> <span class="n">num_output</span><span class="p">)</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">activation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">activation_grad</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_activation_function</span><span class="p">(</span><span class="n">activation</span><span class="p">)</span>

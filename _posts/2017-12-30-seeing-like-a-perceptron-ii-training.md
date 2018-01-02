@@ -181,6 +181,10 @@ Below I've provided my neural network implementation so that you can try this ou
 
 
 ```python
+import numpy as np
+import time
+import sys
+
 def sigmoid(X):
     return 1. / (1. + np.exp(-X))
 
@@ -193,7 +197,7 @@ def relu(X):
 def relu_grad(X):
     return sigmoid(X)
 
-class NeuralNetworkWithPCA(object):
+class NeuralNetworkWithHistory(object):
     def __init__(self, num_input=2, num_hidden=2, num_output=1, learning_rate=0.1, num_epochs=10, activation='relu'):
         self.num_input = num_input
         self.num_hidden = num_hidden
@@ -202,7 +206,6 @@ class NeuralNetworkWithPCA(object):
         self.num_epochs = num_epochs
         
         self.weights_0_1 = np.zeros((num_input, num_hidden))
-        # randomly initialise hidden layer weights to start
         self.weights_1_2 = np.random.randn(num_hidden, num_output)
         
         self.activation, self.activation_grad = self._activation_function(activation)
