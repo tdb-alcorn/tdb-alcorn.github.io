@@ -3,7 +3,7 @@ layout: post
 date:   2017-12-30 20:59:53 -0800
 image: /assets/img/small-wreck-tom.jpg
 title: 'Seeing Like A Perceptron II: Training'
-excerpt: It's maths, not magic
+excerpt: Visualising training progress
 ---
 
 This is a follow-up from a [previous post]({{ "/2017/12/17/seeing-like-a-perceptron.html" | absolute_url }}) in which I discussed how multi-layer perceptrons learn non-linear transformations that embed the input data into a new space in which the classes are linearly separable. The visualisations in that post can give you a clear picture of how the transformation works once the hidden layer perceptrons have already been trained, but what does the output layer see while training is still ongoing, and how does that affect the training process itself?
