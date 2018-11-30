@@ -46,7 +46,7 @@
             <h1 class="post-title" itemprop="name headline">Seeing Like A Perceptron</h1>
             
               <p class="post-meta">
-                <time datetime="2017-12-17T17:59:53-06:00" itemprop="datePublished">
+                <time datetime="2017-12-17T15:59:53-08:00" itemprop="datePublished">
                   
                   Dec 17, 2017
                 </time>
@@ -671,13 +671,13 @@ Essentially, a perceptron takes a weighted average of its input nodes and then c
 <div class="footnotes">
   <ol>
     <li id="fn:3blue1brown">
-      <p>For a great introduction to the mathematics of transformations, I highly recommend 3Blue1Brown’s video series on the <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab">Essence of Linear Algebra</a>.&nbsp;<a href="#fnref:3blue1brown" class="reversefootnote">&#8617;</a></p>
+      <p>For a great introduction to the mathematics of transformations, I highly recommend 3Blue1Brown’s video series on the <a href="https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab">Essence of Linear Algebra</a>. <a href="#fnref:3blue1brown" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:deeplearningbook">
-      <p>Goodfellow et al. (2016) - Deep Learning - Chapter 6, p. 171 - The MIT Press - <a href="http://www.deeplearningbook.org/">www.deeplearningbook.org</a> - Accessed Dec. 2017&nbsp;<a href="#fnref:deeplearningbook" class="reversefootnote">&#8617;</a></p>
+      <p>Goodfellow et al. (2016) - Deep Learning - Chapter 6, p. 171 - The MIT Press - <a href="http://www.deeplearningbook.org/">www.deeplearningbook.org</a> - Accessed Dec. 2017 <a href="#fnref:deeplearningbook" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:ensembles">
-      <p>As an aside, if you take the blending analogy further then another way to think about a multi-layer perceptron is as a kind of <a href="https://en.wikipedia.org/wiki/Ensemble_learning">ensemble method</a>. An ensemble method is a technique for taking predictions from a bunch of lousy models and producing a kind of weighted average that is more correct more often than any of the individual models. One example is something called a random forest, where you create a group of decision trees, train each one on only a small subset of the data, and then use the trees’ collective predictions as a “vote” to decide how to classify each point. Another example is a technique called <a href="https://en.wikipedia.org/wiki/Boosting_(machine_learning)">boosting</a> (the idea behind <a href="https://en.wikipedia.org/wiki/AdaBoost">AdaBoost</a>), in which you train successive models on the data where the previous model made the most mistakes. In our case, we can think of the first layer of the perceptron as an ensemble of lousy perceptrons, except instead of just voting or averaging classifiers, we also do something a little like boosting: we focus in on the areas where the ensemble is least confident and train new models on those regions.&nbsp;<a href="#fnref:ensembles" class="reversefootnote">&#8617;</a></p>
+      <p>As an aside, if you take the blending analogy further then another way to think about a multi-layer perceptron is as a kind of <a href="https://en.wikipedia.org/wiki/Ensemble_learning">ensemble method</a>. An ensemble method is a technique for taking predictions from a bunch of lousy models and producing a kind of weighted average that is more correct more often than any of the individual models. One example is something called a random forest, where you create a group of decision trees, train each one on only a small subset of the data, and then use the trees’ collective predictions as a “vote” to decide how to classify each point. Another example is a technique called <a href="https://en.wikipedia.org/wiki/Boosting_(machine_learning)">boosting</a> (the idea behind <a href="https://en.wikipedia.org/wiki/AdaBoost">AdaBoost</a>), in which you train successive models on the data where the previous model made the most mistakes. In our case, we can think of the first layer of the perceptron as an ensemble of lousy perceptrons, except instead of just voting or averaging classifiers, we also do something a little like boosting: we focus in on the areas where the ensemble is least confident and train new models on those regions. <a href="#fnref:ensembles" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>
