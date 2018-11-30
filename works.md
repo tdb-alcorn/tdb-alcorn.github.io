@@ -1,8 +1,20 @@
 ---
 layout: page
-title: Papers
-permalink: /papers/
+title: Works
+permalink: /works/
 ---
+
+### Tensil: Implementing Tensorlow Models in Silicon
+
+<p class='subtitle'>
+    Chisel Community Conference, November 13 2018
+</p>
+
+Talk: <https://www.youtube.com/watch?v=x_fzoxGpZ_g>
+<br>
+Slides: <https://drive.google.com/file/d/1DuZkwfhy9Sg58xMC4WQGrqi-tJTUlxxR/view>
+
+<br>
 
 ### [Legitimizing Bitcoin: Policy Recommendations][0]
 

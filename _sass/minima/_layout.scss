@@ -5,6 +5,7 @@
   // border-top: 5px solid $grey-color-dark;
   // border-bottom: 1px solid $grey-color-light;
   min-height: $spacing-unit * 1.865;
+  // height: 200px;
   background: transparent;
 
   // Positioning context for the mobile navigation icon
@@ -39,13 +40,15 @@
 
 .title-wrapper {
   display: inline-block;
-  margin-top: 100px;
+  // margin-top: 100px;
+  // margin-top: 0px;
 }
 
 .hero {
   width: 100%;
-  height: 300px;
+  height: 200px;
   background-size: cover;
+  background-position: center;
 }
 
 .title-pop {

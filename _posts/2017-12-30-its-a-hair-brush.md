@@ -1,7 +1,7 @@
 ---
 layout: post
 date: 2017-12-29 18:10:53 -0800
-image: /assets/img/small-wreck-tom.jpg
+image: /assets/img/wave-whale.jpg
 title: It's A Hair Brush
 excerpt: Wherein I appeal to your inner kindergartener
 ---
